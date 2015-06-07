@@ -1,3 +1,4 @@
+# Credits to Json.NET for parts of this script.
 param(
 	[string]$configuration="Debug"
 )
@@ -26,6 +27,12 @@ Get-ChildItem -include "obj","bin" -recurse $sourceDir | ?{ $_.PSIsContainer } |
 foreach ($build in Get-Builds)
 {
 	$name = $build.Name
+	
+	Write-Host
+    Write-Host "Restoring"
+    [Environment]::SetEnvironmentVariable("EnableNuGetPackageRestore", "true", "Process")
+    & $buildDir\NuGet.exe update -self
+    & $buildDir\NuGet.exe restore "$sourceDir\$name.sln" | Out-Default
 	
 	& $msbuild "$sourceDir\$name.sln" "/property:Configuration=$configuration" $targetsOption
 }
