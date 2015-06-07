@@ -1,8 +1,5 @@
-# Credits to Smocks for parts of this packaging script.
-$builds = @(
-	@{Name = "Smocks.Net40"; FinalDir="Net40"; NuGetDir = "net40"; },
-    @{Name = "Smocks.Net45"; FinalDir="Net45"; NuGetDir = "net45"; }
-)
+# Credits to Json.NET for parts of this packaging script.
+. .\Common.ps1
 
 $majorVersion = "0.1"
 $majorWithReleaseVersion = "0.1.0"
@@ -16,6 +13,7 @@ $buildDir = "$baseDir\Build"
 $workingDir = "$buildDir\Work"
 
 $configuration = "Debug"
+$builds = Get-Builds
 
 function Get-VersionFromSolutionInfo() {
 	$solutionInfo = gc "$sourceDir\SolutionInfo.cs"
@@ -32,14 +30,14 @@ function Package([string]$version) {
 		
 		del $workingDir -Recurse -Force
 	}
-
+	
 	foreach ($build in $builds)
 	{
 		$finalDir = $build.FinalDir
 		
 		robocopy "$sourceDir\Smocks\bin\$configuration\$finalDir" $workingDir\Package\Bin\$finalDir *.dll *.pdb *.xml /NFL /NDL /NJS /NC /NS /NP /XO /XF *.CodeAnalysisLog.xml | Out-Default
 	}
-
+	
 	New-Item -Path $workingDir\NuGet -ItemType Directory
 
 	$nuspecPath = "$workingDir\NuGet\Smocks.nuspec"
@@ -73,6 +71,7 @@ function Package([string]$version) {
 	robocopy $sourceDir $workingDir\NuGet\src *.cs /S /NFL /NDL /NJS /NC /NS /NP /XD Smocks.Tests Smocks.TestConsole obj | Out-Default
 
     Write-Host "Building NuGet package with ID $packageId and version $nugetVersion" -ForegroundColor Green
+	Write-Host $nuspecPath
     Write-Host
 
     & "$buildDir\NuGet.exe" pack $nuspecPath -Symbols
