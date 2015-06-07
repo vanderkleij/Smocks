@@ -75,7 +75,9 @@ function Package([string]$version) {
     Write-Host
 
     & "$buildDir\NuGet.exe" pack $nuspecPath -Symbols
-    move -Path .\*.nupkg -Destination $workingDir\NuGet
+	
+	Write-Host "Moving packages to $workingDir\NuGet"
+    Move-Item *.nupkg $workingDir\NuGet
 }
 
 function Edit-XmlNodes {
