@@ -1,6 +1,4 @@
 # Credits to Json.NET for parts of this packaging script.
-. .\Common.ps1
-
 $majorVersion = "0.1"
 $majorWithReleaseVersion = "0.1.0"
 
@@ -11,6 +9,8 @@ $baseDir  = resolve-path "$scriptPath\.."
 $sourceDir = "$baseDir\Source"
 $buildDir = "$baseDir\Build"
 $workingDir = "$buildDir\Work"
+
+. $buildDir\Common.ps1
 
 $configuration = "Debug"
 $builds = Get-Builds

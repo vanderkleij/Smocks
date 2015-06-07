@@ -2,13 +2,14 @@ param(
 	[string]$configuration="Debug"
 )
 
-. .\Common.ps1
-
 $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
 $baseDir  = resolve-path "$scriptPath\.."
+$buildDir = "$baseDir\Build"
 $sourceDir = "$baseDir\Source"
 $targets = "Clean", "Build"
 $targetsOption = "/t:" + [string]::Join(",", $targets)
+
+. $buildDir\Common.ps1
 
 $msbuild = (Get-Command msbuild.exe -errorAction SilentlyContinue | Select -Property Definition).Definition
 
