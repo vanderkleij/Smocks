@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B62B3313-CE1E-40BA-8E58-23FC6CE89ACF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Smocks</RootNamespace>
+    <AssemblyName>Smocks</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\Net40\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\Net40\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\Smocks.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SolutionInfo.cs">
+      <Link>SolutionInfo.cs</Link>
+    </Compile>
+    <Compile Include="AppDomains\AppDomainContext.cs" />
+    <Compile Include="AppDomains\AssemblyLoader.cs" />
+    <Compile Include="AppDomains\AssemblyLoaderFactory.cs" />
+    <Compile Include="AppDomains\AssemblyResolver.cs" />
+    <Compile Include="AppDomains\EnumerableReturnValueTransformer.cs" />
+    <Compile Include="AppDomains\GenericEnumerableReturnValueTransformer.cs" />
+    <Compile Include="AppDomains\IAppDomainContext.cs" />
+    <Compile Include="AppDomains\IAssemblyLoader.cs" />
+    <Compile Include="AppDomains\IAssemblyLoaderFactory.cs" />
+    <Compile Include="AppDomains\ILoadedAssemblyFinder.cs" />
+    <Compile Include="AppDomains\InvocationResult.cs" />
+    <Compile Include="AppDomains\IReturnValueTransformer.cs" />
+    <Compile Include="AppDomains\ISerializableLambdaFilter.cs" />
+    <Compile Include="AppDomains\LoadedAssemblyFinder.cs" />
+    <Compile Include="AppDomains\SerializableLambda.cs" />
+    <Compile Include="AppDomains\SerializableLambdaInvoker.cs" />
+    <Compile Include="Configuration.cs" />
+    <Compile Include="Exceptions\SetupExtractionException.cs" />
+    <Compile Include="Exceptions\VerificationException.cs" />
+    <Compile Include="IL\ArgumentGenerator.cs" />
+    <Compile Include="IL\AssemblyRewriter.cs" />
+    <Compile Include="IL\CompiledDynamicMethod.cs" />
+    <Compile Include="IL\Dependencies\DependencyGraph.cs" />
+    <Compile Include="IL\Dependencies\DependencyGraphBuilder.cs" />
+    <Compile Include="IL\Dependencies\DependencyGraphNode.cs" />
+    <Compile Include="IL\Dependencies\IDependencyGraph.cs" />
+    <Compile Include="IL\Dependencies\IDependencyGraphBuilder.cs" />
+    <Compile Include="IL\Dependencies\IDependencyNodeContainer.cs" />
+    <Compile Include="IL\DisassembleResult.cs" />
+    <Compile Include="IL\DynamicMethodCompiler.cs" />
+    <Compile Include="IL\ExpressionDecompiler.cs" />
+    <Compile Include="IL\Filters\AllowAllModuleFilter.cs" />
+    <Compile Include="IL\Filters\DirectReferencesModuleFilter.cs" />
+    <Compile Include="IL\Filters\IModuleFilter.cs" />
+    <Compile Include="IL\Filters\IModuleFilterFactory.cs" />
+    <Compile Include="IL\Filters\ModuleFilterFactory.cs" />
+    <Compile Include="IL\IArgumentGenerator.cs" />
+    <Compile Include="IL\IAssemblyRewriter.cs" />
+    <Compile Include="IL\ICompiledMethod.cs" />
+    <Compile Include="IL\IExpressionDecompiler.cs" />
+    <Compile Include="IL\IInstructionHelper.cs" />
+    <Compile Include="IL\IMethodImporter.cs" />
+    <Compile Include="IL\IMethodRewriter.cs" />
+    <Compile Include="IL\InstructionHelper.cs" />
+    <Compile Include="IL\IParameterDeducer.cs" />
+    <Compile Include="IL\MethodRewriter.cs" />
+    <Compile Include="IL\ModuleDefinitionMethodImporter.cs" />
+    <Compile Include="IL\ModuleReferenceComparer.cs" />
+    <Compile Include="IL\Parameter.cs" />
+    <Compile Include="IL\ParameterDeducer.cs" />
+    <Compile Include="IL\Resolvers\FieldResolver.cs" />
+    <Compile Include="IL\Resolvers\GenericBindingContext.cs" />
+    <Compile Include="IL\Resolvers\IFieldResolver.cs" />
+    <Compile Include="IL\IILGenerator.cs" />
+    <Compile Include="IL\IInstructionsCompiler.cs" />
+    <Compile Include="IL\RewriteContext.cs" />
+    <Compile Include="Injection\IServiceCreator.cs" />
+    <Compile Include="Injection\IServiceLocator.cs" />
+    <Compile Include="Injection\ServiceCreator.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\LoggerExtensions.cs" />
+    <Compile Include="Logging\LogLevel.cs" />
+    <Compile Include="Matching\It.cs" />
+    <Compile Include="Scope.cs" />
+    <Compile Include="Setups\ArgumentMatcher.cs" />
+    <Compile Include="Setups\IArgumentMatcher.cs" />
+    <Compile Include="Setups\IInternalSetup.cs" />
+    <Compile Include="Setups\IInternalSetup.Generic.cs" />
+    <Compile Include="Setups\IInvocationTracker.cs" />
+    <Compile Include="Setups\InvocationTracker.cs" />
+    <Compile Include="Setups\ISetupManager.cs" />
+    <Compile Include="Setups\ISetupMatcher.cs" />
+    <Compile Include="Setups\ISetupTargetMatcher.cs" />
+    <Compile Include="Setups\ITargetMatcher.cs" />
+    <Compile Include="Setups\Interceptor.cs" />
+    <Compile Include="Setups\SetupManager.cs" />
+    <Compile Include="Setups\SetupMatcher.cs" />
+    <Compile Include="Setups\SetupTargetCollection.cs" />
+    <Compile Include="IL\Visitors\IInstructionVisitor.cs" />
+    <Compile Include="IL\ILGeneratorInstructionVisitor.cs" />
+    <Compile Include="IL\ILGeneratorWrapper.cs" />
+    <Compile Include="IL\IMethodDisassembler.cs" />
+    <Compile Include="IL\Visitors\InstructionVisitorBase.cs" />
+    <Compile Include="IL\Resolvers\AssemblyTypeContainer.cs" />
+    <Compile Include="IL\Resolvers\IMethodResolver.cs" />
+    <Compile Include="IL\InstructionExtensions.cs" />
+    <Compile Include="IL\IOpCodeMapper.cs" />
+    <Compile Include="IL\ISetupExtractor.cs" />
+    <Compile Include="IL\Resolvers\IModuleResolver.cs" />
+    <Compile Include="IL\Resolvers\ITypeContainer.cs" />
+    <Compile Include="IL\Resolvers\ITypeResolver.cs" />
+    <Compile Include="IL\MethodDisassembler.cs" />
+    <Compile Include="IL\Visitors\NumberPoppedVisitor.cs" />
+    <Compile Include="IL\Visitors\NumberPushedVisitor.cs" />
+    <Compile Include="IL\OpCodeMapper.cs" />
+    <Compile Include="IL\Resolvers\MethodResolver.cs" />
+    <Compile Include="IL\Resolvers\ModuleResolver.cs" />
+    <Compile Include="IL\SetupExtractor.cs" />
+    <Compile Include="IL\Resolvers\TypeResolver.cs" />
+    <Compile Include="ISmocksContext.cs" />
+    <Compile Include="Smock.cs" />
+    <Compile Include="Smock1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Smock.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SmocksContext.cs" />
+    <Compile Include="Serialization\ISerializer.cs" />
+    <Compile Include="Serialization\Serializer.cs" />
+    <Compile Include="Setups\ISetup.cs" />
+    <Compile Include="Setups\ISetup.Generic.cs" />
+    <Compile Include="Setups\ISetupTargetCollection.cs" />
+    <Compile Include="Setups\SetupTarget.cs" />
+    <Compile Include="Setups\Setup.cs" />
+    <Compile Include="Setups\Setup.Generic.cs" />
+    <Compile Include="Setups\SetupTargetMatcher.cs" />
+    <Compile Include="Setups\TargetMatcher.cs" />
+    <Compile Include="Utility\ArgumentChecker.cs" />
+    <Compile Include="Injection\DefaultServiceLocatorSetup.cs" />
+    <Compile Include="Utility\Discoverer.cs" />
+    <Compile Include="Utility\ExpressionHelper.cs" />
+    <Compile Include="Utility\IExpressionHelper.cs" />
+    <Compile Include="Injection\IServiceLocatorContainer.cs" />
+    <Compile Include="Injection\IServiceLocatorSetup.cs" />
+    <Compile Include="Injection\ServiceLocatorContainer.cs" />
+    <Compile Include="Utility\ImmutableList.cs" />
+    <Compile Include="Utility\MethodCallInfo.cs" />
+    <Compile Include="Injection\ServiceLocator.cs" />
+    <Compile Include="Utility\Unit.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Smocks.licenseheader">
+      <Link>Smocks.licenseheader</Link>
+    </None>
+    <None Include="..\Smocks.snk">
+      <Link>Smocks.snk</Link>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Smock.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Smock1.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

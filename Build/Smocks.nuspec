@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Smocks</id>
+    <version>1.0.0.0</version>
+    <title>Smocks</title>
+    <authors>Tom van der Kleij</authors>
+    <licenseUrl>https://github.com/vanderkleij/Smocks/LICENSE.MD</licenseUrl>
+    <projectUrl>https://github.com/vanderkleij/Smocks/README.MD</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Smocks is a library for mocking the normally unmockable. It can mock static and non-virtual methods and properties, amongst others.</description>
+    <tags>Mock Mocking Static Moq Fakes Moles</tags>
+  </metadata>
+</package>
