@@ -3,7 +3,8 @@ param(
 	[string]$configuration="Debug"
 )
 
-$baseDir  = resolve-path ..
+$scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
+$baseDir  = resolve-path "$scriptPath\.."
 $sourceDir = "$baseDir\Source"
 $targets = "Clean", "Build"
 
