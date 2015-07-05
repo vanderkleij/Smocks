@@ -60,8 +60,8 @@ PM> Install-Package Smocks
 
 ## Roadmap
 
-- Strategies for deciding which assemblies to rewrite
-- `.Returns((arg1, arg2) => ...)`
+- ~~Strategies for deciding which assemblies to rewrite~~
+- ~~`.Returns((arg1, arg2) => ...)`~~
 - `.Callback((arg1, arg2) => ...)`
 - Strong-named assemblies
 - Configurable strict/loose mocking
