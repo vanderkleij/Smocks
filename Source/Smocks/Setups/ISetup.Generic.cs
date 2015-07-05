@@ -21,6 +21,8 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System;
+
 namespace Smocks.Setups
 {
     /// <summary>
@@ -28,13 +30,24 @@ namespace Smocks.Setups
     /// and/or expectations for the target of the setup.
     /// </summary>
     /// <typeparam name="TReturnValue">The type of the return value.</typeparam>
-    public interface ISetup<in TReturnValue> : ISetup
+    public partial interface ISetup<in TReturnValue> : ISetup
     {
         /// <summary>
         /// Configures a constant return value.
         /// </summary>
         /// <param name="returnValue">The return value.</param>
-        /// <returns>The setup for fluent chaining.</returns>
+        /// <returns>
+        /// The setup for fluent chaining.
+        /// </returns>
         ISetup<TReturnValue> Returns(TReturnValue returnValue);
+
+        /// <summary>
+        /// Configures a generated return value.
+        /// </summary>
+        /// <param name="returnValue">The return value.</param>
+        /// <returns>
+        /// The setup for fluent chaining.
+        /// </returns>
+        ISetup<TReturnValue> Returns(Func<TReturnValue> returnValue);
     }
 }

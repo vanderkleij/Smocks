@@ -27,6 +27,6 @@ namespace Smocks.Setups
     {
         bool HasReturnValue { get; }
 
-        TReturnValue ReturnValue { get; }
+        TReturnValue GetReturnValue(object[] arguments);
     }
 }

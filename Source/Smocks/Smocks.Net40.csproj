@@ -140,11 +140,21 @@
     <Compile Include="Setups\IInternalSetup.Generic.cs" />
     <Compile Include="Setups\IInvocationTracker.cs" />
     <Compile Include="Setups\InvocationTracker.cs" />
+    <Compile Include="Setups\ISetup.Generic.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ISetup.Generic.Generated.tt</DependentUpon>
+    </Compile>
     <Compile Include="Setups\ISetupManager.cs" />
     <Compile Include="Setups\ISetupMatcher.cs" />
     <Compile Include="Setups\ISetupTargetMatcher.cs" />
     <Compile Include="Setups\ITargetMatcher.cs" />
     <Compile Include="Setups\Interceptor.cs" />
+    <Compile Include="Setups\Setup.Generic.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Setup.Generic.Generated.tt</DependentUpon>
+    </Compile>
     <Compile Include="Setups\SetupManager.cs" />
     <Compile Include="Setups\SetupMatcher.cs" />
     <Compile Include="Setups\SetupTargetCollection.cs" />
@@ -208,7 +218,15 @@
     <None Include="..\Smocks.snk">
       <Link>Smocks.snk</Link>
     </None>
+    <None Include="Setups\ISetup.Generic.Generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ISetup.Generic.Generated.cs</LastGenOutput>
+    </None>
     <None Include="packages.config" />
+    <None Include="Setups\Setup.Generic.Generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Setup.Generic.Generated.cs</LastGenOutput>
+    </None>
     <None Include="Smock.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Smock1.cs</LastGenOutput>

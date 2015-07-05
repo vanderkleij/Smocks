@@ -27,6 +27,7 @@ using System.Linq;
 using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Smocks.IL.Resolvers;
 using Smocks.Setups;
 using Smocks.Utility;
 
@@ -111,7 +112,7 @@ namespace Smocks.IL
             // we add them backwards as well.
             for (int i = parameters.Count - 1; i >= 0; --i)
             {
-                TypeReference parameterType = parameters[i];
+                TypeReference parameterType = ResolveGenericParameters(parameters[i], targetMethod);
 
                 if (parameterType.IsValueType)
                 {
@@ -161,6 +162,19 @@ namespace Smocks.IL
             return method.Name == CecilConstructorName;
         }
 
+        private static TypeReference ResolveGenericParameters(TypeReference typeReference, MethodReference method)
+        {
+            GenericInstanceMethod genericInstanceMethod = method as GenericInstanceMethod;
+
+            if (genericInstanceMethod != null)
+            {
+                GenericBindingContext context = GenericBindingContext.Create(genericInstanceMethod);
+                typeReference = context.Resolve(typeReference);
+            }
+
+            return typeReference;
+        }
+
         private void CreatePushTargetMethodOnStackInstructions(ILProcessor processor,
             MethodReference targetMethod, Instruction replacementInstruction)
         {
@@ -187,6 +201,9 @@ namespace Smocks.IL
                 TypeReference returnValue = IsConstructor(context.Method)
                     ? context.Method.DeclaringType
                     : context.Method.ReturnType;
+
+                returnValue = ResolveGenericParameters(returnValue, context.Method);
+
                 boundMethod.GenericArguments.Add(returnValue);
 
                 importedReplacement = boundMethod;

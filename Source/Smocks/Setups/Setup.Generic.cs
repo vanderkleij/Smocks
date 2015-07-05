@@ -26,33 +26,66 @@ using Smocks.Utility;
 
 namespace Smocks.Setups
 {
-    internal class Setup<TReturnValue> : Setup, IInternalSetup<TReturnValue>
+    internal partial class Setup<TReturnValue> : Setup, IInternalSetup<TReturnValue>
     {
+        private TReturnValue _constantReturnValue;
+
+        private Func<object[], TReturnValue> _returnValueGenerator;
+
         public Setup(MethodCallInfo methodCall)
             : base(methodCall)
         {
         }
 
-        public TReturnValue ConstantReturnValue { get; private set; }
+        public TReturnValue ConstantReturnValue
+        {
+            get
+            {
+                return _constantReturnValue;
+            }
+
+            set
+            {
+                _constantReturnValue = value;
+                ReturnValueGenerator = null;
+                HasConstantReturnValue = true;
+            }
+        }
 
         public bool HasConstantReturnValue { get; private set; }
 
         public bool HasReturnValue
         {
-            get { return HasConstantReturnValue; }
+            get { return HasConstantReturnValue || ReturnValueGenerator != null; }
         }
 
-        public TReturnValue ReturnValue
+        public Func<object[], TReturnValue> ReturnValueGenerator
         {
             get
             {
-                if (HasConstantReturnValue)
-                {
-                    return ConstantReturnValue;
-                }
-
-                throw new InvalidOperationException("No return value specified");
+                return _returnValueGenerator;
             }
+
+            set
+            {
+                _returnValueGenerator = value;
+                HasConstantReturnValue = false;
+            }
+        }
+
+        public TReturnValue GetReturnValue(object[] arguments)
+        {
+            if (HasConstantReturnValue)
+            {
+                return ConstantReturnValue;
+            }
+
+            if (ReturnValueGenerator != null)
+            {
+                return ReturnValueGenerator(arguments);
+            }
+
+            throw new InvalidOperationException("No return value specified");
         }
 
         public ISetup<TReturnValue> Returns(TReturnValue returnValue)
@@ -60,6 +93,12 @@ namespace Smocks.Setups
             ConstantReturnValue = returnValue;
             HasConstantReturnValue = true;
 
+            return this;
+        }
+
+        public ISetup<TReturnValue> Returns(Func<TReturnValue> generator)
+        {
+            ReturnValueGenerator = args => generator();
             return this;
         }
     }

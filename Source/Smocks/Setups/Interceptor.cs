@@ -91,7 +91,7 @@ namespace Smocks.Setups
 
                 if (setup.HasReturnValue)
                 {
-                    return setup.ReturnValue;
+                    return setup.GetReturnValue(arguments);
                 }
             }
 

@@ -1,0 +1,45 @@
+﻿<#@ template  debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Assembly Name="System.Windows.Forms" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+
+namespace Smocks.Setups
+{
+    /// <summary>
+    /// A setup for an expression that can be used to configure the behaviour
+    /// and/or expectations for the target of the setup.
+    /// </summary>
+    /// <typeparam name="TReturnValue">The type of the return value.</typeparam>
+    public partial interface ISetup<in TReturnValue> : ISetup
+    {
+	<#
+    for (int i = 0; i < 16; ++i)
+    {
+		var args = Enumerable.Range(1, i + 1).Select(x => "T" + x).ToList();
+		var genericArgs = string.Join(", ", args);
+		var functionArgs = string.Join(", ", args.Concat(new List<string> { "TReturnValue" }));
+	#>
+	/// <summary>
+        /// Configures a callback that returns the return value.
+        /// </summary>
+		<# foreach (string arg in args) { #>
+/// <typeparam name="<#= arg #>">The type of the argument.</typeparam>
+		<#
+		}
+		#>
+/// <param name="generator">The generator.</param>
+        /// <returns>The return value.</returns>
+        ISetup<TReturnValue> Returns<<#= genericArgs #>>(Func<<#= functionArgs #>> generator);
+
+	<#
+	}
+	#>
+    }
+}

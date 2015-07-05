@@ -38,9 +38,9 @@ namespace Smocks.IL
     {
         private readonly Configuration _configuration;
         private readonly IMethodRewriter _methodRewriter;
+        private readonly IModuleFilter _moduleFilter;
         private readonly List<string> _rewrittenAssemblies = new List<string>();
         private readonly ISetupTargetCollection _setupTargetCollection;
-        private readonly IModuleFilter _moduleFilter;
 
         internal AssemblyRewriter(IMethodRewriter methodRewriter, IModuleFilter moduleFilter)
             : this(new Configuration(), new List<SetupTarget>(), methodRewriter, moduleFilter)
@@ -66,13 +66,13 @@ namespace Smocks.IL
 
         internal AssemblyRewriter(
                 Configuration configuration,
-                IEnumerable<SetupTarget> targets, 
-                IMethodRewriter methodRewriter, 
+                IEnumerable<SetupTarget> targets,
+                IMethodRewriter methodRewriter,
                 IModuleFilter moduleFilter)
             : this(
-                configuration, 
-                new SetupTargetCollection(targets), 
-                methodRewriter, 
+                configuration,
+                new SetupTargetCollection(targets),
+                methodRewriter,
                 moduleFilter)
         {
         }
@@ -121,7 +121,7 @@ namespace Smocks.IL
                 WriteSymbols = hasSymbols,
                 SymbolWriterProvider = new PdbWriterProvider()
             };
-            
+
             assembly.Write(outputPath, writerParameters);
 
             _rewrittenAssemblies.Add(outputPath);

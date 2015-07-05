@@ -1,0 +1,50 @@
+﻿<#@ template  debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Assembly Name="System.Windows.Forms" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+using Smocks.Utility;
+
+namespace Smocks.Setups
+{
+    internal partial class Setup<TReturnValue>
+    {
+<#
+    for (int i = 0; i < 16; ++i)
+    {
+		var args = Enumerable.Range(1, i + 1).Select(x => "T" + x).ToList();
+		var genericArgs = string.Join(", ", args);
+		var functionArgs = string.Join(", ", args.Concat(new List<string> { "TReturnValue" }));
+		var convertCalls = string.Join(",\r\n\t\t\t\t",
+			args.Select((value, index) => string.Format("({0})Convert.ChangeType(args[{1}], typeof({0}))", value, index)));
+	#>
+		/// <summary>
+        /// Configures a callback that returns the return value.
+        /// </summary>
+		<# foreach (string arg in args) { #>
+/// <typeparam name="<#= arg #>">The type of the argument.</typeparam>
+		<#
+		}
+		#>
+/// <param name="generator">The generator.</param>
+        /// <returns>The return value.</returns>
+        public ISetup<TReturnValue> Returns<<#= genericArgs #>>(Func<<#= functionArgs #>> generator)
+		{
+			ReturnValueGenerator = args => generator(
+				<#= convertCalls #>
+				);
+
+			return this;
+		}
+
+<#
+	}
+	#>
+	}
+}

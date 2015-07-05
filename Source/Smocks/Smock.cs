@@ -40,10 +40,10 @@ namespace Smocks
     /// </summary>
     public partial class Smock
     {
-        private readonly IServiceLocator _serviceLocator;
-        private readonly ISetupExtractor _setupExtractor;
         private readonly IDependencyGraphBuilder _dependencyGraphBuilder;
         private readonly IModuleFilterFactory _moduleFilterFactory;
+        private readonly IServiceLocator _serviceLocator;
+        private readonly ISetupExtractor _setupExtractor;
 
         private Smock(IServiceLocator serviceLocator)
         {
@@ -117,6 +117,17 @@ namespace Smocks
             return context.RunFunc(func, configuration);
         }
 
+        private IAssemblyRewriter CreateAssemblyRewriter(Delegate @delegate, Configuration configuration)
+        {
+            var dependencyGraph = _dependencyGraphBuilder.BuildGraphForMethod(@delegate.Method);
+            var setups = _setupExtractor.GetSetups(@delegate.Method, @delegate.Target).ToList();
+
+            var moduleFilter = _moduleFilterFactory.GetFilter(configuration.Scope, dependencyGraph);
+            var rewriter = new AssemblyRewriter(configuration, setups,
+                _serviceLocator.Resolve<IMethodRewriter>(), moduleFilter);
+            return rewriter;
+        }
+
         private void RunAction(Action<ISmocksContext> action, Configuration configuration)
         {
             IAssemblyRewriter rewriter = CreateAssemblyRewriter(action, configuration);
@@ -140,17 +151,6 @@ namespace Smocks
                 context.Invoke(new Action(() => ServiceLocator.Instance = CreateServiceLocator(configuration)));
                 return context.Invoke(func, _serviceLocator.Resolve<ISmocksContext>());
             }
-        }
-
-        private IAssemblyRewriter CreateAssemblyRewriter(Delegate @delegate, Configuration configuration)
-        {
-            var dependencyGraph = _dependencyGraphBuilder.BuildGraphForMethod(@delegate.Method);
-            var setups = _setupExtractor.GetSetups(@delegate.Method, @delegate.Target).ToList();
-
-            var moduleFilter = _moduleFilterFactory.GetFilter(configuration.Scope, dependencyGraph);
-            var rewriter = new AssemblyRewriter(configuration, setups,
-                _serviceLocator.Resolve<IMethodRewriter>(), moduleFilter);
-            return rewriter;
         }
     }
 }

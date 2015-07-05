@@ -33,13 +33,23 @@ namespace Smocks
     /// </summary>
     public class Configuration : MarshalByRefObject
     {
-        private IServiceLocatorSetup _serviceLocatorSetup = new DefaultServiceLocatorSetup();
         private Scope _scope = Scope.DirectReferences;
+        private IServiceLocatorSetup _serviceLocatorSetup = new DefaultServiceLocatorSetup();
 
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
         public Logger Logger { get; set; }
+
+        /// <summary>
+        /// Gets or sets the scope of Smocks: should it rewrite only direct references
+        /// or rewrite any loaded assembly.
+        /// </summary>
+        public Scope Scope
+        {
+            get { return _scope; }
+            set { _scope = value; }
+        }
 
         /// <summary>
         /// Gets or sets the service locator setup.
@@ -56,16 +66,6 @@ namespace Smocks
                 ArgumentChecker.NotNull(value, () => value);
                 _serviceLocatorSetup = value;
             }
-        }
-
-        /// <summary>
-        /// Gets or sets the scope of Smocks: should it rewrite only direct references
-        /// or rewrite any loaded assembly.
-        /// </summary>
-        public Scope Scope
-        {
-            get { return _scope; }
-            set { _scope = value; }
         }
     }
 }

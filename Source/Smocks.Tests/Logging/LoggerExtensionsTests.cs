@@ -1,9 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#region License
+//// The MIT License (MIT)
+//// 
+//// Copyright (c) 2015 Tom van der Kleij
+//// 
+//// Permission is hereby granted, free of charge, to any person obtaining a copy of
+//// this software and associated documentation files (the "Software"), to deal in
+//// the Software without restriction, including without limitation the rights to
+//// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+//// the Software, and to permit persons to whom the Software is furnished to do so,
+//// subject to the following conditions:
+//// 
+//// The above copyright notice and this permission notice shall be included in all
+//// copies or substantial portions of the Software.
+//// 
+//// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+//// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+//// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+//// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+//// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#endregion
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Smocks.Logging;
@@ -16,10 +33,12 @@ namespace Smocks.Tests.Logging
     {
         private Mock<Logger> _loggerMock;
 
-        [SetUp]
-        public void Setup()
+        [TestCase]
+        public void Debug_LoggerNull_DoesntThrow()
         {
-            _loggerMock = new Mock<Logger>(MockBehavior.Strict);
+#pragma warning disable 1720 // Expression will always throw a nullreference warning.
+            Assert.DoesNotThrow(() => default(Logger).Debug(string.Empty));
+#pragma warning restore 1720
         }
 
         [TestCase("Hello, {0}!", 12, "Hello, 12!")]
@@ -31,10 +50,10 @@ namespace Smocks.Tests.Logging
         }
 
         [TestCase]
-        public void Debug_LoggerNull_DoesntThrow()
+        public void Error_LoggerNull_DoesntThrow()
         {
 #pragma warning disable 1720 // Expression will always throw a nullreference warning.
-            Assert.DoesNotThrow(() => default(Logger).Debug(""));
+            Assert.DoesNotThrow(() => default(Logger).Error(string.Empty));
 #pragma warning restore 1720
         }
 
@@ -47,10 +66,10 @@ namespace Smocks.Tests.Logging
         }
 
         [TestCase]
-        public void Error_LoggerNull_DoesntThrow()
+        public void Fatal_LoggerNull_DoesntThrow()
         {
 #pragma warning disable 1720 // Expression will always throw a nullreference warning.
-            Assert.DoesNotThrow(() => default(Logger).Error(""));
+            Assert.DoesNotThrow(() => default(Logger).Fatal(string.Empty));
 #pragma warning restore 1720
         }
 
@@ -63,10 +82,10 @@ namespace Smocks.Tests.Logging
         }
 
         [TestCase]
-        public void Fatal_LoggerNull_DoesntThrow()
+        public void Info_LoggerNull_DoesntThrow()
         {
 #pragma warning disable 1720 // Expression will always throw a nullreference warning.
-            Assert.DoesNotThrow(() => default(Logger).Fatal(""));
+            Assert.DoesNotThrow(() => default(Logger).Info(string.Empty));
 #pragma warning restore 1720
         }
 
@@ -78,11 +97,17 @@ namespace Smocks.Tests.Logging
             _loggerMock.Verify();
         }
 
+        [SetUp]
+        public void Setup()
+        {
+            _loggerMock = new Mock<Logger>(MockBehavior.Strict);
+        }
+
         [TestCase]
-        public void Info_LoggerNull_DoesntThrow()
+        public void Warn_LoggerNull_DoesntThrow()
         {
 #pragma warning disable 1720 // Expression will always throw a nullreference warning.
-            Assert.DoesNotThrow(() => default(Logger).Info(""));
+            Assert.DoesNotThrow(() => default(Logger).Warn(string.Empty));
 #pragma warning restore 1720
         }
 
@@ -92,14 +117,6 @@ namespace Smocks.Tests.Logging
             _loggerMock.Setup(logger => logger.Log(LogLevel.Warn, totalMessage)).Verifiable();
             _loggerMock.Object.Warn(format, argument);
             _loggerMock.Verify();
-        }
-
-        [TestCase]
-        public void Warn_LoggerNull_DoesntThrow()
-        {
-#pragma warning disable 1720 // Expression will always throw a nullreference warning.
-            Assert.DoesNotThrow(() => default(Logger).Warn(""));
-#pragma warning restore 1720
         }
     }
 }

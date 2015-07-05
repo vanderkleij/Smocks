@@ -20,6 +20,7 @@
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
+
 using System;
 using System.Runtime.Serialization;
 
@@ -35,7 +36,8 @@ namespace Smocks.Exceptions
         /// Initializes a new instance of the <see cref="SetupExtractionException" /> class.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
-        internal SetupExtractionException(string message) : base(message)
+        internal SetupExtractionException(string message)
+            : base(message)
         {
         }
 

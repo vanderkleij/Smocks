@@ -122,7 +122,15 @@ namespace Smocks.IL.Resolvers
                 Type methodParameter = methodParameters[i];
                 TypeReference otherParameter = parameterTypes[i];
 
-                if (methodParameter.ContainsGenericParameters)
+                if (methodParameter.IsGenericParameter)
+                {
+                    if (!otherParameter.IsGenericParameter ||
+                        otherParameter.Name != methodParameter.Name)
+                    {
+                        return false;
+                    }
+                }
+                else if (methodParameter.ContainsGenericParameters)
                 {
                     var otherParameterType = _typeResolver.Resolve(otherParameter.Resolve());
                     var methodParameterGeneric = methodParameter.GetGenericTypeDefinition();
