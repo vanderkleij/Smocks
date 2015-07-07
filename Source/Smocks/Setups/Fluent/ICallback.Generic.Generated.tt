@@ -16,7 +16,7 @@ namespace Smocks.Setups.Fluent
     /// Contains .Callback(...) setup methods
     /// </summary>
     /// <typeparam name="TReturnValue">The type of the return value.</typeparam>
-    public partial interface ICallback<TReturnValue>
+    public partial interface ICallback<in TReturnValue>
     {
 	<#
     for (int i = 0; i < 16; ++i)
