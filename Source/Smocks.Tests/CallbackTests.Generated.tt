@@ -1,0 +1,72 @@
+﻿<#@ template debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Assembly Name="System.Windows.Forms" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+using System.Diagnostics.CodeAnalysis;
+using NUnit.Framework;
+using Smocks.Tests.TestUtility;
+
+namespace Smocks.Tests
+{
+    [TestFixture]
+    public partial class CallbackTests
+    {
+<#
+    var counts = new[] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+            "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen",
+            "Fifteen", "Sixteen" };
+
+    for (int i = 1; i <= 16; ++i)
+    {
+        var numbers = Enumerable.Range(1, i);
+        var letters = Enumerable.Range('a', i).Select(x => (char)x).ToArray();
+	#>
+        [TestCase]
+        public void Callback_<#= counts[i] #>MatchingArgs_InvokesCallbackWithArguments()
+        {
+            Smock.Run(context =>
+            {
+                int sum = 0;
+                context
+                    .Setup(() => TestFunctions.<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>(<#= string.Join(", ", numbers) #>))
+                    .Callback<#= GetGenericTypes(i)  #>((<#= string.Join(", ", letters) #>) => sum = <#= string.Join(" + ", letters) #>);
+
+                TestFunctions.<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>(<#= string.Join(", ", numbers) #>);
+                Assert.AreEqual(<#= numbers.Sum() #>, sum);
+            });
+        }
+
+        [TestCase]
+        public void Callback_Void<#= counts[i] #>MatchingArgs_InvokesCallbackWithArguments()
+        {
+            Smock.Run(context =>
+            {
+                int sum = 0;
+                context
+                    .Setup(() => TestFunctions.Void<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>(<#= string.Join(", ", numbers) #>))
+                    .Callback<#= GetGenericTypes(i)  #>((<#= string.Join(", ", letters) #>) => sum = <#= string.Join(" + ", letters) #>);
+
+                TestFunctions.Void<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>(<#= string.Join(", ", numbers) #>);
+                Assert.AreEqual(<#= numbers.Sum() #>, sum);
+            });
+        }
+
+<#
+	}
+	#>
+	}
+}
+<#+
+    private string GetGenericTypes(int n) 
+    {
+        string types = string.Join(", ", Enumerable.Repeat("int", n));
+        return types == string.Empty ? types : string.Format("<{0}>", types);
+    }
+#>

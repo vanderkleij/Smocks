@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 //// The MIT License (MIT)
 //// 
 //// Copyright (c) 2015 Tom van der Kleij
@@ -20,19 +20,19 @@
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
-using Mono.Cecil;
 
-namespace Smocks.IL.Filters
+namespace Smocks.Setups.Fluent
 {
-    internal class AllowAllModuleFilter : IModuleFilter
+    /// <summary>
+    /// Contains .Verifiable(...) setup methods
+    /// </summary>
+    public interface IVerifiable
     {
-        public bool Accepts(ModuleDefinition module)
-        {
-            return true;
-        }
-
-        public void Dispose()
-        {
-        }
+        /// <summary>
+        /// Marks this setup as verifiable. If the <see cref="ISmocksContext.Verify"/>
+        /// method is invoked after marking the setup as verifiable  and the target of
+        /// the setup has never been invoked, an exception will be thrown.
+        /// </summary>
+        void Verifiable();
     }
 }

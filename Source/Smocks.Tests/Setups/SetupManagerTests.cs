@@ -57,9 +57,9 @@ namespace Smocks.Tests.Setups
                 .Returns(methodCallInfo);
 
             var subject = new SetupManager(_expressionHelperMock.Object);
-            var setup = subject.Create(expression);
+            ISetup setup = subject.Create(expression);
 
-            Assert.IsTrue(subject.SequenceEqual(new[] { setup }));
+            Assert.IsTrue(subject.Cast<ISetup>().SequenceEqual(new[] { setup }));
         }
 
         [TestCase]

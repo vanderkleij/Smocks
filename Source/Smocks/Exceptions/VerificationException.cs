@@ -23,7 +23,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 using Smocks.Setups;
 using Smocks.Utility;
@@ -42,12 +41,9 @@ namespace Smocks.Exceptions
         /// Initializes a new instance of the <see cref="VerificationException" /> class.
         /// </summary>
         /// <param name="notMatchedSetups">The not matched setups.</param>
-        public VerificationException(IEnumerable<ISetup> notMatchedSetups)
+        internal VerificationException(IEnumerable<IInternalSetupBase> notMatchedSetups)
             : base(GetMessage(notMatchedSetups))
         {
-            ArgumentChecker.NotNull(notMatchedSetups, () => notMatchedSetups);
-
-            NotMatchedSetups = notMatchedSetups.ToArray();
         }
 
         /// <summary>
@@ -60,13 +56,10 @@ namespace Smocks.Exceptions
         {
         }
 
-        /// <summary>
-        /// Gets or sets the failed setups.
-        /// </summary>
-        public ISetup[] NotMatchedSetups { get; set; }
-
-        private static string GetMessage(IEnumerable<ISetup> notMatchedSetups)
+        private static string GetMessage(IEnumerable<IInternalSetupBase> notMatchedSetups)
         {
+            ArgumentChecker.NotNull(notMatchedSetups, () => notMatchedSetups);
+
             return "Verification failed";
         }
     }

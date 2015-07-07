@@ -22,26 +22,57 @@
 #endregion
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Smocks.Utility;
 
 namespace Smocks.Setups
 {
-    internal partial class Setup : SetupBase, ISetup, IInternalSetup
+    internal abstract class SetupBase : IInternalSetupBase
     {
-        internal Setup(MethodCallInfo methodCall) 
-            : base(methodCall)
+        protected SetupBase(MethodCallInfo methodCall)
         {
+            ArgumentChecker.NotNull(methodCall, () => methodCall);
+
+            MethodCall = methodCall;
         }
 
-        public ISetup Callback(Action callback)
-        {
-            if (ParameterCount != 0)
-            {
-                throw new ArgumentException("Invalid parameter count", "callback");
-            }
+        public Lazy<Exception> Exception { get; private set; }
 
-            CallbackAction = args => callback();
-            return this;
+        public MethodCallInfo MethodCall { get; private set; }
+
+        public Action<object[]> CallbackAction { get; set; }
+
+        public bool Verify { get; private set; }
+
+        protected int ParameterCount
+        {
+            get
+            {
+                int extraParameters = (!MethodCall.Method.IsStatic && 
+                    !MethodCall.Method.IsConstructor) ? 1 : 0;
+                return MethodCall.Method.GetParameters().Length + extraParameters;
+            }
+        }
+
+        public void Throws<TException>() where TException : Exception, new()
+        {
+            Exception = new Lazy<Exception>(() => new TException());
+        }
+
+        public void Throws<TException>(TException exception) where TException : Exception
+        {
+            Exception = new Lazy<Exception>(() => exception);
+        }
+
+        [ExcludeFromCodeCoverage]
+        public override string ToString()
+        {
+            return MethodCall.ToString();
+        }
+
+        public void Verifiable()
+        {
+            Verify = true;
         }
     }
 }

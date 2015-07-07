@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 //// The MIT License (MIT)
 //// 
 //// Copyright (c) 2015 Tom van der Kleij
@@ -20,19 +20,29 @@
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
-using Mono.Cecil;
 
-namespace Smocks.IL.Filters
+using System;
+
+namespace Smocks.Setups.Fluent
 {
-    internal class AllowAllModuleFilter : IModuleFilter
+    /// <summary>
+    /// Contains .Throws(...) setup methods
+    /// </summary>
+    public interface IThrows
     {
-        public bool Accepts(ModuleDefinition module)
-        {
-            return true;
-        }
+        /// <summary>
+        /// Configures an exception that will be thrown when
+        /// the target of the setup is invoked.
+        /// </summary>
+        /// <typeparam name="TException">The type of the exception.</typeparam>
+        void Throws<TException>() where TException : Exception, new();
 
-        public void Dispose()
-        {
-        }
+        /// <summary>
+        /// Configures an exception that will be thrown when
+        /// the target of the setup is invoked.
+        /// </summary>
+        /// <typeparam name="TException">The type of the exception.</typeparam>
+        /// <param name="exception">The that will be thrown.</param>
+        void Throws<TException>(TException exception) where TException : Exception;
     }
 }

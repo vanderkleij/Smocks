@@ -1,0 +1,44 @@
+﻿<#@ template  debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Assembly Name="System.Windows.Forms" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+
+namespace Smocks.Setups.Fluent
+{
+    /// <summary>
+    /// Contains .Callback(...) setup methods
+    /// </summary>
+    /// <typeparam name="TReturnValue">The type of the return value.</typeparam>
+    public partial interface ICallback<TReturnValue>
+    {
+	<#
+    for (int i = 0; i < 16; ++i)
+    {
+		var args = Enumerable.Range(1, i + 1).Select(x => "T" + x).ToList();
+		var genericArgs = string.Join(", ", args);
+		var functionArgs = string.Join(", ", args.Concat(new List<string> { "TReturnValue" }));
+	#>
+	/// <summary>
+        /// Configures a callback that is invoked when the setup's target is invoked.
+        /// </summary>
+		<# foreach (string arg in args) { #>
+/// <typeparam name="<#= arg #>">The type of the argument.</typeparam>
+		<#
+		}
+		#>
+/// <param name="callback">The callback.</param>
+        /// <returns>The setup.</returns>
+        ISetup<TReturnValue> Callback<<#= genericArgs #>>(Action<<#= genericArgs #>> callback);
+
+	<#
+	}
+	#>
+    }
+}

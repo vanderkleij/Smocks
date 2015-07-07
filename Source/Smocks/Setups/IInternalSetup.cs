@@ -21,17 +21,9 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using System;
-using Smocks.Utility;
-
 namespace Smocks.Setups
 {
-    internal interface IInternalSetup : ISetup
+    internal interface IInternalSetup : IInternalSetupBase
     {
-        Lazy<Exception> Exception { get; }
-
-        MethodCallInfo MethodCall { get; }
-
-        bool Verify { get; }
     }
 }

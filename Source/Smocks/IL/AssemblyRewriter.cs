@@ -79,6 +79,8 @@ namespace Smocks.IL
 
         public void Dispose()
         {
+            _moduleFilter.Dispose();
+
             foreach (string assemblyPath in _rewrittenAssemblies)
             {
                 Delete(assemblyPath);

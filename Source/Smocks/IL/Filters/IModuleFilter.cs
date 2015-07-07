@@ -20,11 +20,12 @@
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
+using System;
 using Mono.Cecil;
 
 namespace Smocks.IL.Filters
 {
-    internal interface IModuleFilter
+    internal interface IModuleFilter : IDisposable
     {
         bool Accepts(ModuleDefinition module);
     }

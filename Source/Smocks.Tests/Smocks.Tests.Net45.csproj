@@ -88,6 +88,17 @@
     <Compile Include="AppDomains\LoadedAssemblyFinderTests.cs" />
     <Compile Include="AppDomains\SerializableLambdaTests.cs" />
     <Compile Include="ArgumentMatchingTests.cs" />
+    <Compile Include="CallbackTests.cs" />
+    <Compile Include="CallbackExceptionTests.cs">
+      <DependentUpon>CallbackExceptionTests.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="CallbackTests.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CallbackTests.Generated.tt</DependentUpon>
+    </Compile>
     <Compile Include="FuncTests.cs" />
     <Compile Include="IL\ArgumentGeneratorTests.cs" />
     <Compile Include="IL\CompiledDynamicMethodTests.cs" />
@@ -150,9 +161,19 @@
     <None Include="..\Smocks.snk">
       <Link>Smocks.snk</Link>
     </None>
+    <None Include="CallbackExceptionTests.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CallbackExceptionTests.cs</LastGenOutput>
+    </None>
+    <None Include="CallbackTests.Generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CallbackTests.Generated.cs</LastGenOutput>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

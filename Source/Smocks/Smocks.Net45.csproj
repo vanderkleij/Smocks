@@ -128,21 +128,43 @@
     <Compile Include="Matching\It.cs" />
     <Compile Include="Scope.cs" />
     <Compile Include="Setups\ArgumentMatcher.cs" />
+    <Compile Include="Setups\Fluent\ICallback.cs" />
+    <Compile Include="Setups\Fluent\ICallback.Generated.cs">
+      <DependentUpon>ICallback.Generated.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Setups\Fluent\ICallback.Generic.cs" />
+    <Compile Include="Setups\Fluent\IReturns.cs" />
+    <Compile Include="Setups\Fluent\ICallback.Generic.Generated.cs">
+      <DependentUpon>ICallback.Generic.Generated.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Setups\Fluent\IReturns.Generated.cs">
+      <DependentUpon>IReturns.Generated.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Setups\Fluent\IThrows.cs" />
+    <Compile Include="Setups\Fluent\IVerifiable.cs" />
     <Compile Include="Setups\IArgumentMatcher.cs" />
     <Compile Include="Setups\IInternalSetup.cs" />
     <Compile Include="Setups\IInternalSetup.Generic.cs" />
+    <Compile Include="Setups\IInternalSetupBase.cs" />
     <Compile Include="Setups\IInvocationTracker.cs" />
     <Compile Include="Setups\InvocationTracker.cs" />
-    <Compile Include="Setups\ISetup.Generic.Generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ISetup.Generic.Generated.tt</DependentUpon>
-    </Compile>
     <Compile Include="Setups\ISetupManager.cs" />
     <Compile Include="Setups\ISetupMatcher.cs" />
     <Compile Include="Setups\ISetupTargetMatcher.cs" />
     <Compile Include="Setups\ITargetMatcher.cs" />
     <Compile Include="Setups\Interceptor.cs" />
+    <Compile Include="Setups\Setup.cs" />
+    <Compile Include="Setups\Setup.Generated.cs">
+      <DependentUpon>Setup.Generated.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Setups\Setup.Generic.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -187,7 +209,7 @@
     <Compile Include="Setups\ISetup.Generic.cs" />
     <Compile Include="Setups\ISetupTargetCollection.cs" />
     <Compile Include="Setups\SetupTarget.cs" />
-    <Compile Include="Setups\Setup.cs" />
+    <Compile Include="Setups\SetupBase.cs" />
     <Compile Include="Setups\Setup.Generic.cs" />
     <Compile Include="Setups\SetupTargetMatcher.cs" />
     <Compile Include="Setups\TargetMatcher.cs" />
@@ -211,11 +233,23 @@
     <None Include="..\Smocks.snk">
       <Link>Smocks.snk</Link>
     </None>
-    <None Include="Setups\ISetup.Generic.Generated.tt">
+    <None Include="Setups\Fluent\ICallback.Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ISetup.Generic.Generated.cs</LastGenOutput>
+      <LastGenOutput>ICallback.Generated.cs</LastGenOutput>
+    </None>
+    <None Include="Setups\Fluent\ICallback.Generic.Generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ICallback.Generic.Generated.cs</LastGenOutput>
+    </None>
+    <None Include="Setups\Fluent\IReturns.Generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IReturns.Generated.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
+    <None Include="Setups\Setup.Generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Setup.Generated.cs</LastGenOutput>
+    </None>
     <None Include="Setups\Setup.Generic.Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Setup.Generic.Generated.cs</LastGenOutput>

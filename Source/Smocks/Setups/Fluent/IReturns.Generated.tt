@@ -10,14 +10,13 @@
 <#@ import namespace="System.Collections.Generic" #>
 using System;
 
-namespace Smocks.Setups
+namespace Smocks.Setups.Fluent
 {
     /// <summary>
-    /// A setup for an expression that can be used to configure the behaviour
-    /// and/or expectations for the target of the setup.
+    /// Contains .Returns(...) setup methods
     /// </summary>
     /// <typeparam name="TReturnValue">The type of the return value.</typeparam>
-    public partial interface ISetup<in TReturnValue> : ISetup
+    public partial interface IReturns<TReturnValue>
     {
 	<#
     for (int i = 0; i < 16; ++i)
@@ -35,7 +34,7 @@ namespace Smocks.Setups
 		}
 		#>
 /// <param name="generator">The generator.</param>
-        /// <returns>The return value.</returns>
+        /// <returns>The setup.</returns>
         ISetup<TReturnValue> Returns<<#= genericArgs #>>(Func<<#= functionArgs #>> generator);
 
 	<#

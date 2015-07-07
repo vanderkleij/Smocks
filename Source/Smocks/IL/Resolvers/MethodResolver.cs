@@ -48,14 +48,12 @@ namespace Smocks.IL.Resolvers
 
         public MethodBase Resolve(MethodReference methodReference, GenericBindingContext bindingContext)
         {
-            var methodDefinition = methodReference.Resolve();
-
-            Type declaringType = _typeResolver.Resolve(methodDefinition.DeclaringType);
+            Type declaringType = _typeResolver.Resolve(methodReference.DeclaringType);
 
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.ExactBinding;
-            flags |= methodDefinition.HasThis ? BindingFlags.Instance : BindingFlags.Static;
+            flags |= methodReference.HasThis ? BindingFlags.Instance : BindingFlags.Static;
 
-            IEnumerable<MethodBase> candidates = IsConstructor(methodDefinition.Name)
+            IEnumerable<MethodBase> candidates = IsConstructor(methodReference.Name)
                 ? (IEnumerable<MethodBase>)declaringType.GetConstructors(flags)
                 : declaringType.GetMethods(flags);
 
@@ -63,17 +61,17 @@ namespace Smocks.IL.Resolvers
 
             if (methodReference.IsGenericInstance)
             {
-                MethodBase genericMethod = Resolve(methodDefinition, bindingContext);
+                MethodBase genericMethod = Resolve(methodReference.Resolve(), bindingContext);
 
                 result = BindGenericArguments(methodReference, genericMethod);
             }
             else
             {
-                TypeReference[] parameterTypes = methodDefinition.Parameters.Select(parameter =>
+                TypeReference[] parameterTypes = methodReference.Parameters.Select(parameter =>
                     parameter.ParameterType).ToArray();
 
-                result = FindMethod(candidates, methodDefinition.Name, parameterTypes,
-                    methodDefinition.HasGenericParameters, bindingContext);
+                result = FindMethod(candidates, methodReference.Name, parameterTypes,
+                    methodReference.HasGenericParameters, bindingContext);
             }
 
             return result;

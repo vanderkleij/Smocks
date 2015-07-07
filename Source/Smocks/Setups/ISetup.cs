@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using Smocks.Setups.Fluent;
 
 namespace Smocks.Setups
 {
@@ -29,28 +30,13 @@ namespace Smocks.Setups
     /// A setup for an expression that can be used to configure the behaviour
     /// and/or expectations for the target of the setup.
     /// </summary>
-    public interface ISetup
+    public partial interface ISetup : ICallback, IThrows, IVerifiable
     {
         /// <summary>
-        /// Configures an exception that will be thrown when
-        /// the target of the setup is invoked.
+        /// Configures a callback that is invoked when the setup's target is invoked.
         /// </summary>
-        /// <typeparam name="TException">The type of the exception.</typeparam>
-        void Throws<TException>() where TException : Exception, new();
-
-        /// <summary>
-        /// Configures an exception that will be thrown when
-        /// the target of the setup is invoked.
-        /// </summary>
-        /// <typeparam name="TException">The type of the exception.</typeparam>
-        /// <param name="exception">The that will be thrown.</param>
-        void Throws<TException>(TException exception) where TException : Exception;
-
-        /// <summary>
-        /// Marks this setup as verifiable. If the <see cref="ISmocksContext.Verify"/>
-        /// method is invoked after marking the setup as verifiable  and the target of
-        /// the setup has never been invoked, an exception will be thrown.
-        /// </summary>
-        void Verifiable();
+        /// <param name="callback">The callback.</param>
+        /// <returns>The setup.</returns>
+        ISetup Callback(Action callback);
     }
 }

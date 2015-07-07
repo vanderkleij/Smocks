@@ -13,7 +13,7 @@ using Smocks.Utility;
 
 namespace Smocks.Setups
 {
-    internal partial class Setup<TReturnValue>
+    internal partial class Setup
     {
 <#
     for (int i = 0; i < 16; ++i)
@@ -24,30 +24,6 @@ namespace Smocks.Setups
 		var convertCalls = string.Join(",\r\n\t\t\t\t",
 			args.Select((value, index) => string.Format("({0})Convert.ChangeType(args[{1}], typeof({0}))", value, index)));
 	#>
-		/// <summary>
-        /// Configures a callback that returns the return value.
-        /// </summary>
-		<# foreach (string arg in args) { #>
-/// <typeparam name="<#= arg #>">The type of the argument.</typeparam>
-		<#
-		}
-		#>
-/// <param name="generator">The generator.</param>
-        /// <returns>The setup.</returns>
-        public ISetup<TReturnValue> Returns<<#= genericArgs #>>(Func<<#= functionArgs #>> generator)
-		{
-            if (ParameterCount != <#= args.Count #>)
-            {
-                throw new ArgumentException("Invalid parameter count", "callback");    
-            }
-
-			ReturnValueGenerator = args => generator(
-				<#= convertCalls #>
-				);
-
-			return this;
-		}
-
         /// <summary>
         /// Configures a callback that is invoked when the setup's target is invoked.
         /// </summary>
@@ -58,7 +34,7 @@ namespace Smocks.Setups
 		#>
 /// <param name="callback">The callback.</param>
         /// <returns>The setup.</returns>
-        public ISetup<TReturnValue> Callback<<#= genericArgs #>>(Action<<#= genericArgs #>> callback)
+        public ISetup Callback<<#= genericArgs #>>(Action<<#= genericArgs #>> callback)
 		{
             if (ParameterCount != <#= args.Count #>)
             {

@@ -26,7 +26,7 @@ using Smocks.Utility;
 
 namespace Smocks.Setups
 {
-    internal partial class Setup<TReturnValue> : Setup, IInternalSetup<TReturnValue>
+    internal partial class Setup<TReturnValue> : SetupBase, IInternalSetup<TReturnValue>
     {
         private TReturnValue _constantReturnValue;
 
@@ -99,6 +99,22 @@ namespace Smocks.Setups
         public ISetup<TReturnValue> Returns(Func<TReturnValue> generator)
         {
             ReturnValueGenerator = args => generator();
+            return this;
+        }
+
+        /// <summary>
+        /// Configures a callback that is invoked when the setup's target is invoked.
+        /// </summary>
+        /// <param name="callback">The callback.</param>
+        /// <returns>The setup.</returns>
+        public ISetup<TReturnValue> Callback(Action callback)
+        {
+            if (ParameterCount != 0)
+            {
+                throw new ArgumentException("Invalid parameter count", "callback");
+            }
+
+            CallbackAction = args => callback();
             return this;
         }
     }

@@ -1,0 +1,130 @@
+﻿<#@ template debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Assembly Name="System.Windows.Forms" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+#region License
+//// The MIT License (MIT)
+//// 
+//// Copyright (c) 2015 Tom van der Kleij
+//// 
+//// Permission is hereby granted, free of charge, to any person obtaining a copy of
+//// this software and associated documentation files (the "Software"), to deal in
+//// the Software without restriction, including without limitation the rights to
+//// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+//// the Software, and to permit persons to whom the Software is furnished to do so,
+//// subject to the following conditions:
+//// 
+//// The above copyright notice and this permission notice shall be included in all
+//// copies or substantial portions of the Software.
+//// 
+//// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+//// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+//// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+//// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+//// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#endregion
+using System;
+using System.Diagnostics.CodeAnalysis;
+using NUnit.Framework;
+using Smocks.Tests.TestUtility;
+
+namespace Smocks.Tests
+{
+    [SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1508:ClosingCurlyBracketsMustNotBePrecededByBlankLine", Justification = "Generated.")]
+    [SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1507:CodeMustNotContainMultipleBlankLinesInARow", Justification = "Generated.")]
+    [ExcludeFromCodeCoverage]
+    [TestFixture]
+    public class CallbackExceptionTests
+    {
+<#
+    var counts = new[] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+            "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen",
+            "Fifteen", "Sixteen" };
+
+    for (int i = 1; i <= 16; ++i)
+    {
+        var numbers = Enumerable.Range(1, i);
+        var letters = Enumerable.Range('a', i).Select(x => (char)x).ToArray();
+	#>
+        [TestCase]
+        public void Callback_VoidLessThanExpected<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>_ThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+            {
+                Smock.Run(context =>
+                {
+                    context
+                        .Setup(() => TestFunctions.Void<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>(<#= string.Join(", ", numbers) #>))
+                        .Callback<#= GetGenericTypes(i - 1) #>((<#= string.Join(", ", letters.Take(i - 1)) #>) => { });
+                });
+            });
+        }
+
+        [TestCase]
+        public void Callback_LessThanExpected<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>_ThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+            {
+                Smock.Run(context =>
+                {
+                    context
+                        .Setup(() => TestFunctions.<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>(<#= string.Join(", ", numbers) #>))
+                        .Callback<#= GetGenericTypes(i - 1) #>((<#= string.Join(", ", letters.Take(i - 1)) #>) => { });
+                });
+            });
+        }
+
+<#
+if (i <= 15)
+{
+#>
+        [TestCase]
+        public void Callback_VoidMoreThanExpected<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>_ThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+            {
+                Smock.Run(context =>
+                {
+                    context
+                        .Setup(() => TestFunctions.Void<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>(<#= string.Join(", ", numbers) #>))
+                        .Callback<#= GetGenericTypes(i + 1) #>((<#= string.Join(", ", letters) #>, z) => { });
+                });
+            });
+        }
+
+        [TestCase]
+        public void Callback_MoreThanExpected<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>_ThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+            {
+                Smock.Run(context =>
+                {
+                    context
+                        .Setup(() => TestFunctions.<#= counts[i] #>Argument<#= i != 1 ? "s" : "" #>(<#= string.Join(", ", numbers) #>))
+                        .Callback<#= GetGenericTypes(i + 1) #>((<#= string.Join(", ", letters) #>, z) => { });
+                });
+            });
+        }
+<#
+}
+#>
+
+<#
+}
+#>
+    }
+}
+<#+
+    private string GetGenericTypes(int n) 
+    {
+        string types = string.Join(", ", Enumerable.Repeat("int", n));
+        return types == string.Empty ? types : string.Format("<{0}>", types);
+    }
+#>

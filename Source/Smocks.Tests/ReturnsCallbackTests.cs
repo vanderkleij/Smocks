@@ -188,6 +188,34 @@ namespace Smocks.Tests
         }
 
         [TestCase]
+        public void ReturnsCallback_TooManyArguments_ThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+            {
+                Smock.Run(context =>
+                {
+                    context
+                        .Setup(() => TestFunctions.OneArgument(1))
+                        .Returns<int, int>((a, b) => 42);
+                });
+            });
+        }
+
+        [TestCase]
+        public void ReturnsCallback_TooFewArguments_ThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+            {
+                Smock.Run(context =>
+                {
+                    context
+                        .Setup(() => TestFunctions.TwoArguments(1, 2))
+                        .Returns<int>(a => 42);
+                });
+            });
+        }
+
+        [TestCase]
         public void ReturnsCallback_SingleNonConvertibleArg_ThrowsException()
         {
             Smock.Run(context =>

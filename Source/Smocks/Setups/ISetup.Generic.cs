@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using Smocks.Setups.Fluent;
 
 namespace Smocks.Setups
 {
@@ -30,7 +31,11 @@ namespace Smocks.Setups
     /// and/or expectations for the target of the setup.
     /// </summary>
     /// <typeparam name="TReturnValue">The type of the return value.</typeparam>
-    public partial interface ISetup<in TReturnValue> : ISetup
+    public partial interface ISetup<in TReturnValue> : 
+        ICallback<TReturnValue>, 
+        IReturns<TReturnValue>, 
+        IThrows, 
+        IVerifiable
     {
         /// <summary>
         /// Configures a constant return value.
@@ -49,5 +54,12 @@ namespace Smocks.Setups
         /// The setup for fluent chaining.
         /// </returns>
         ISetup<TReturnValue> Returns(Func<TReturnValue> returnValue);
+
+        /// <summary>
+        /// Configures a callback that is invoked when the setup's target is invoked.
+        /// </summary>
+        /// <param name="callback">The callback.</param>
+        /// <returns>The setup.</returns>
+        ISetup<TReturnValue> Callback(Action callback);
     }
 }
