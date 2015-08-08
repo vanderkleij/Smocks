@@ -21,6 +21,7 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
@@ -65,14 +66,29 @@ namespace Smocks.Setups
                 return true;
             }
 
-            if (method.IsStatic)
-            {
-                return _argumentMatcher.IsMatch(setupArguments, actualArguments);
-            }
+            int argumentsToSkip = method.IsStatic ? 0 : 1;
 
             return _targetMatcher.IsMatch(method.DeclaringType, setupArguments[0], actualArguments[0]) &&
-                    (actualArguments.Length == 1 || // No need to check empty array of arguments
-                        _argumentMatcher.IsMatch(setupArguments.Skip(1), actualArguments.Skip(1)));
+                    (actualArguments.Length == argumentsToSkip || // No need to check empty array of arguments
+                        _argumentMatcher.IsMatch(FilterArguments(method, setupArguments.Skip(argumentsToSkip)), 
+                            FilterArguments(method, actualArguments.Skip(argumentsToSkip))));
+        }
+
+        private static IEnumerable<T> FilterArguments<T>(MethodBase method, IEnumerable<T> items)
+        {
+            var parameters = method.GetParameters();
+            
+            // We skip out parameters as these don't have to be matched.
+            int i = 0;
+            foreach (var item in items)
+            {
+                if (!parameters[i].IsOut)
+                {
+                    yield return item;
+                }
+
+                ++i;
+            }
         }
     }
 }

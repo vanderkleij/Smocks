@@ -22,6 +22,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Smocks.Setups;
@@ -52,5 +53,46 @@ namespace Smocks.IL
         public List<SetupTarget> Targets { get; set; }
 
         public List<VariableDefinition> Variables { get; private set; }
+
+        public Instruction CurrentPosition
+        {
+            get { return OriginalInstruction.Previous; }
+        }
+
+        public void Replace(Instruction target, IEnumerable<Instruction> instructions)
+        {
+            InsertAfter(target, instructions);
+            Processor.Remove(target);
+        }
+
+        public void InsertAfter(Instruction target, IEnumerable<Instruction> instructions)
+        {
+            foreach (var instruction in instructions.Reverse())
+            {
+                Processor.InsertAfter(target, instruction);
+            }
+        }
+
+        public void InsertBefore(Instruction target, IEnumerable<Instruction> instructions)
+        {
+            foreach (var instruction in instructions)
+            {
+                Processor.InsertBefore(target, instruction);
+            }
+        }
+
+        public Instruction Insert(Instruction instruction)
+        {
+            Processor.InsertBefore(OriginalInstruction, instruction);
+            return instruction;
+        }
+
+        public void AddVariables(IEnumerable<VariableDefinition> variables)
+        {
+            foreach (var variable in variables)
+            {
+                Processor.Body.Variables.Add(variable);
+            }
+        }
     }
 }

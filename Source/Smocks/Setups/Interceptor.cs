@@ -21,8 +21,10 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion License
 
+using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Smocks.Injection;
 using Smocks.Utility;
 
@@ -36,19 +38,24 @@ namespace Smocks.Setups
     {
         private readonly IInvocationTracker _invocationTracker;
         private readonly ISetupMatcher _setupMatcher;
+        private readonly IExpressionHelper _expressionHelper;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Interceptor"/> class.
+        /// Initializes a new instance of the <see cref="Interceptor" /> class.
         /// </summary>
         /// <param name="setupMatcher">The setup matcher.</param>
         /// <param name="invocationTracker">The invocation tracker.</param>
-        internal Interceptor(ISetupMatcher setupMatcher, IInvocationTracker invocationTracker)
+        /// <param name="expressionHelper">The expression helper.</param>
+        internal Interceptor(ISetupMatcher setupMatcher, IInvocationTracker invocationTracker,
+            IExpressionHelper expressionHelper)
         {
             ArgumentChecker.NotNull(setupMatcher, () => setupMatcher);
             ArgumentChecker.NotNull(invocationTracker, () => invocationTracker);
+            ArgumentChecker.NotNull(expressionHelper, () => expressionHelper);
 
             _setupMatcher = setupMatcher;
             _invocationTracker = invocationTracker;
+            _expressionHelper = expressionHelper;
         }
 
         /// <summary>
@@ -57,8 +64,9 @@ namespace Smocks.Setups
         /// <typeparam name="TReturnValue">The type of the return value.</typeparam>
         /// <param name="arguments">The arguments provided in the original method call.</param>
         /// <param name="originalMethod">The original method.</param>
-        /// <returns>The return value after interception.</returns>
-        public static TReturnValue Intercept<TReturnValue>(object[] arguments, MethodBase originalMethod)
+        /// <returns>A result that specifies whether the method was intercepted
+        /// and what the return value is, if it was.</returns>
+        public static InterceptorResult<TReturnValue> Intercept<TReturnValue>(object[] arguments, MethodBase originalMethod)
         {
             return ServiceLocator.Instance.Resolve<Interceptor>()
                 .InterceptMethod<TReturnValue>(arguments, originalMethod);
@@ -69,13 +77,14 @@ namespace Smocks.Setups
         /// </summary>
         /// <param name="arguments">The arguments provided in the original method call.</param>
         /// <param name="originalMethod">The original method.</param>
-        public static void InterceptVoid(object[] arguments, MethodBase originalMethod)
+        /// <returns>A result that specifies whether the method was intercepted.</returns>
+        public static InterceptorResult InterceptVoid(object[] arguments, MethodBase originalMethod)
         {
-            ServiceLocator.Instance.Resolve<Interceptor>()
+            return ServiceLocator.Instance.Resolve<Interceptor>()
                 .InterceptVoidMethod(arguments, originalMethod);
         }
 
-        internal TReturnValue InterceptMethod<TReturnValue>(object[] arguments, MethodBase originalMethod)
+        internal InterceptorResult<TReturnValue> InterceptMethod<TReturnValue>(object[] arguments, MethodBase originalMethod)
         {
             var setup = _setupMatcher.GetBestMatchingSetup(
                 originalMethod, arguments) as IInternalSetup<TReturnValue>;
@@ -84,32 +93,35 @@ namespace Smocks.Setups
 
             if (setup != null)
             {
-                HandleSetup(arguments, setup);
+                HandleSetup(arguments, setup, originalMethod);
 
-                if (setup.HasReturnValue)
-                {
-                    return setup.GetReturnValue(arguments);
-                }
+                TReturnValue returnValue = setup.HasReturnValue
+                    ? setup.GetReturnValue(arguments)
+                    : default(TReturnValue);
+
+                return new InterceptorResult<TReturnValue>(true, returnValue);
             }
 
-            return (TReturnValue)InvokeOriginalMethod(arguments, originalMethod);
+            return new InterceptorResult<TReturnValue>(false, default(TReturnValue));
         }
 
-        internal void InterceptVoidMethod(object[] arguments, MethodBase originalMethod)
+        internal InterceptorResult InterceptVoidMethod(object[] arguments, MethodBase originalMethod)
         {
             IInternalSetup setup = _setupMatcher.GetBestMatchingSetup(originalMethod, arguments);
 
             _invocationTracker.Track(originalMethod, arguments, setup);
 
-            if (setup != null)
+            if (setup == null)
             {
-                HandleSetup(arguments, setup);
+                return new InterceptorResult(false);
             }
 
-            InvokeOriginalMethod(arguments, originalMethod);
+            HandleSetup(arguments, setup, originalMethod);
+
+            return new InterceptorResult(true);
         }
 
-        private static void HandleSetup(object[] arguments, IInternalSetupBase setup)
+        private void HandleSetup(object[] arguments, IInternalSetupBase setup, MethodBase originalMethod)
         {
             if (setup.Exception != null)
             {
@@ -120,21 +132,23 @@ namespace Smocks.Setups
             {
                 setup.CallbackAction(arguments);
             }
+
+            HandleOutParameters(arguments, setup, originalMethod);
         }
 
-        private static object InvokeOriginalMethod(object[] arguments, MethodBase originalMethod)
+        private void HandleOutParameters(object[] arguments, IInternalSetupBase setup, MethodBase originalMethod)
         {
-            ConstructorInfo constructor = originalMethod as ConstructorInfo;
+            ParameterInfo[] parameters = originalMethod.GetParameters();
 
-            if (constructor != null)
+            for (int i = 0; i < parameters.Length; ++i)
             {
-                return constructor.Invoke(arguments);
+                int offset = originalMethod.IsStatic ? 0 : 1;
+
+                if (parameters[i].IsOut)
+                {
+                    arguments[i + offset] = _expressionHelper.GetValue(setup.MethodCall.Arguments[i + offset]);
+                }
             }
-
-            object target = originalMethod.IsStatic ? null : arguments[0];
-            arguments = originalMethod.IsStatic ? arguments : arguments.Skip(1).ToArray();
-
-            return originalMethod.Invoke(target, arguments);
         }
     }
 }

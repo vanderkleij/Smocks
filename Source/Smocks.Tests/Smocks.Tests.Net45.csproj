@@ -121,6 +121,7 @@
     <Compile Include="Injection\ServiceLocatorTests.cs" />
     <Compile Include="Logging\LoggerExtensionsTests.cs" />
     <Compile Include="MethodTests.cs" />
+    <Compile Include="OutParameterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReturnsCallbackTests.cs" />
     <Compile Include="Serialization\SerializerTests.cs" />

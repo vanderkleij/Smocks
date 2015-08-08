@@ -28,6 +28,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 using Smocks.IL.Resolvers;
 using Smocks.IL.Visitors;
 using Smocks.Utility;
@@ -88,17 +89,44 @@ namespace Smocks.IL
         /// <returns>The compiled expression.</returns>
         public Expression Decompile(MethodBody body, Instruction instruction, object target)
         {
-            int expectedStackSize = 1;
-
             BitArray includedInstructions = new BitArray(body.Instructions.Count);
 
-            int startIndex = body.Instructions.IndexOf(instruction) - 1;
+            if (IncludeInstructionsUntilStackEmpty(body, instruction, includedInstructions))
+            {
+                List<Instruction> instructions = body.Instructions
+                        .Where((t, i) => includedInstructions[i])
+                        .ToList();
 
-            // The variable 'instruction' currently points to the instruction where
+                // Gets the parameters used by the instructions.
+                TypeReference[] parameterTypes = _parameterDeducer.GetParameters(body.Method, instructions);
+                Type[] resolvedParameterTypes = parameterTypes.Select(_typeResolver.Resolve).ToArray();
+
+                // TODO: pass only the used variables instead of Body.Variables.
+                // Currently, this is bugged so body.Variables is used. The additional
+                // variables are not really an issue.
+                ICompiledMethod<Expression> method = _instructionsCompiler.Compile<Expression>(
+                    parameterTypes, instructions, body.Variables);
+
+                // Try to construct the arguments required by the instructions.
+                object[] arguments = _argumentGenerator.GetArguments(resolvedParameterTypes, target).ToArray();
+
+                return method.Invoke(arguments);
+            }
+
+            return null;
+        }
+
+        private bool IncludeInstructionsUntilStackEmpty(MethodBody body, 
+            Instruction instruction, BitArray includedInstructions)
+        {
+            int expectedStackSize = 1;
+            int instructionIndex = body.Instructions.IndexOf(instruction);
+
+            // Instruction currently points to the instruction where
             // we have an expression on the stack. We now walk the instructions in
             // reverse to the point where we have nothing on the stack. We can then
             // replay the instructions from there to get the expression.
-            for (int index = startIndex; index >= 0; index--)
+            for (int index = instructionIndex - 1; index >= 0; index--)
             {
                 Instruction current = body.Instructions[index];
                 includedInstructions[index] = true;
@@ -110,28 +138,62 @@ namespace Smocks.IL
 
                 if (expectedStackSize == 0)
                 {
-                    List<Instruction> instructions = body.Instructions
-                        .Where((t, i) => includedInstructions[i])
-                        .ToList();
-
-                    // Gets the parameters used by the instructions.
-                    TypeReference[] parameterTypes = _parameterDeducer.GetParameters(body.Method, instructions);
-                    Type[] resolvedParameterTypes = parameterTypes.Select(_typeResolver.Resolve).ToArray();
-
-                    // TODO: pass only the used variables instead of Body.Variables.
-                    // Currently, this is bugged so body.Variables is used. The additional
-                    // variables are not really an issue.
-                    ICompiledMethod<Expression> method = _instructionsCompiler.Compile<Expression>(
-                        parameterTypes, instructions, body.Variables);
-
-                    // Try to construct the arguments required by the instructions.
-                    object[] arguments = _argumentGenerator.GetArguments(resolvedParameterTypes, target).ToArray();
-
-                    return method.Invoke(arguments);
+                    // We might be left with a set of instructions where the first usage of
+                    // a variable is a read, e.g. a ldloc.2. In these cases, we need to include
+                    // the instructions that initialize the variable so that the first usage
+                    // of a variable is a write instead.
+                    IncludeVariableInitializationInstructions(body, includedInstructions);
+                    
+                    return true;
                 }
             }
 
-            return null;
+            return false;
+        }
+
+        private void IncludeVariableInitializationInstructions(
+            MethodBody body, 
+            BitArray includedInstructions)
+        {
+            while (true)
+            {
+                List<Instruction> instructions = body.Instructions
+                    .Where((t, i) => includedInstructions[i])
+                    .ToList();
+
+                VariableUsage firstReadUsage = _instructionHelper
+                    .GetUsages(instructions)
+                    .GroupBy(usage => usage.Index)
+                    .Select(group => group.First())
+                    .FirstOrDefault(usage => usage.Operation == VariableOperation.Read);
+
+                if (firstReadUsage == null)
+                {
+                    return;
+                }
+
+                IncludeWriteOfVariable(body, includedInstructions, firstReadUsage);
+            }
+        }
+
+        private void IncludeWriteOfVariable(MethodBody body, BitArray includedInstructions, VariableUsage readUsage)
+        {
+            int readIndex = body.Instructions.IndexOf(readUsage.Instruction);
+            List<Instruction> precedingInstructions = body.Instructions.Take(readIndex).ToList();
+
+            VariableUsage writeUsage = _instructionHelper
+                .GetUsages(precedingInstructions)
+                .LastOrDefault(usage => usage.Operation == VariableOperation.Write && usage.Index == readUsage.Index);
+
+            if (writeUsage == null)
+            {
+                throw new InvalidOperationException("Could not find write of variable " + readUsage.Index);
+            }
+
+            int writeIndex = body.Instructions.IndexOf(writeUsage.Instruction);
+            
+            includedInstructions[writeIndex] = true;
+            IncludeInstructionsUntilStackEmpty(body, writeUsage.Instruction, includedInstructions);
         }
 
         private static int GetNumberPoppedByInstruction(Instruction current)

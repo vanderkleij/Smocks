@@ -21,6 +21,7 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System.Collections.Generic;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -28,6 +29,77 @@ namespace Smocks.IL
 {
     internal class InstructionHelper : IInstructionHelper
     {
+        public IEnumerable<VariableUsage> GetUsages(IEnumerable<Instruction> instructions)
+        {
+            foreach (var instruction in instructions)
+            {
+                int variableIndex;
+
+                if (ReadsVariable(instruction, out variableIndex))
+                {
+                    yield return new VariableUsage(variableIndex, instruction, VariableOperation.Read);
+                }
+                else if (WritesVariable(instruction, out variableIndex))
+                {
+                    yield return new VariableUsage(variableIndex, instruction, VariableOperation.Write);
+                }
+            }
+        }
+
+        private bool WritesVariable(Instruction instruction, out int variableIndex)
+        {
+            variableIndex = -1;
+
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Stloc:
+                case Code.Stloc_S:
+                    variableIndex = ((VariableReference)instruction.Operand).Index;
+                    return true;
+                case Code.Stloc_0:
+                    variableIndex = 0;
+                    return true;
+                case Code.Stloc_1:
+                    variableIndex = 1;
+                    return true;
+                case Code.Stloc_2:
+                    variableIndex = 2;
+                    return true;
+                case Code.Stloc_3:
+                    variableIndex = 3;
+                    return true;
+            }
+
+            return false;
+        }
+
+        private bool ReadsVariable(Instruction instruction, out int variableIndex)
+        {
+            variableIndex = -1;
+
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Ldloc:
+                case Code.Ldloc_S:
+                    variableIndex = ((VariableReference)instruction.Operand).Index;
+                    return true;
+                case Code.Ldloc_0:
+                    variableIndex = 0;
+                    return true;
+                case Code.Ldloc_1:
+                    variableIndex = 1;
+                    return true;
+                case Code.Ldloc_2:
+                    variableIndex = 2;
+                    return true;
+                case Code.Ldloc_3:
+                    variableIndex = 3;
+                    return true;
+            }
+
+            return false;
+        }
+
         public bool ReadsParameter(MethodReference method, Instruction instruction,
             out Parameter parameter)
         {

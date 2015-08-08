@@ -21,6 +21,7 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System.Collections.Generic;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -28,6 +29,8 @@ namespace Smocks.IL
 {
     internal interface IInstructionHelper
     {
+        IEnumerable<VariableUsage> GetUsages(IEnumerable<Instruction> instructions);
+
         bool ReadsParameter(MethodReference method, Instruction instruction,
             out Parameter parameter);
 
