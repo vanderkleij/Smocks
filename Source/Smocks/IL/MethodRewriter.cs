@@ -167,14 +167,24 @@ namespace Smocks.IL
             return bound;
         }
 
-        private Instruction InvokeOriginalMethod(RewriteContext context, List<VariableDefinition> variables, bool isVoidMethod)
+        private Instruction InvokeOriginalMethod(RewriteContext context, List<VariableDefinition> variables)
         {
             Instruction instruction;
             Instruction firstInstruction = null;
 
             foreach (var variable in variables)
             {
-                instruction = context.Insert(Instruction.Create(OpCodes.Ldloc, variable));
+                // If we're calling an instance method of a value type, we need to put the
+                // *address* of the variable on the stack.
+                if (context.Method.HasThis && context.Method.DeclaringType.IsValueType)
+                {
+                    instruction = context.Insert(Instruction.Create(OpCodes.Ldloca, variable));
+                }
+                else
+                {
+                    instruction = context.Insert(Instruction.Create(OpCodes.Ldloc, variable));
+                }
+
                 firstInstruction = firstInstruction ?? instruction;
             }
 
@@ -241,7 +251,7 @@ namespace Smocks.IL
             context.Insert(Instruction.Create(OpCodes.Br, context.OriginalInstruction.Next));
 
             // If it wasn't we need to rebuild the stack and invoke the original method.
-            Instruction invokeOriginalStartInstruction = InvokeOriginalMethod(context, variables, isVoidMethod);
+            Instruction invokeOriginalStartInstruction = InvokeOriginalMethod(context, variables);
 
             // Inject an instruction to jump based on whether the instruction was intercepted.
             var interceptedPropertyGetter = context.Method.Module.Import(InterceptedProperty.GetGetMethod());

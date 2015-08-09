@@ -124,6 +124,9 @@ namespace Smocks.IL
                 SymbolWriterProvider = new PdbWriterProvider()
             };
 
+            // TODO: REMOVE
+            assembly.Write(@"d:\temp\rewritten.dll", writerParameters);
+
             assembly.Write(outputPath, writerParameters);
 
             _rewrittenAssemblies.Add(outputPath);

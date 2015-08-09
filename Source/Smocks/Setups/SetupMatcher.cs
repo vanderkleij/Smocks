@@ -66,12 +66,23 @@ namespace Smocks.Setups
                 return true;
             }
 
-            int argumentsToSkip = method.IsStatic ? 0 : 1;
+            int itemsToSkip = 0;
 
-            return _targetMatcher.IsMatch(method.DeclaringType, setupArguments[0], actualArguments[0]) &&
-                    (actualArguments.Length == argumentsToSkip || // No need to check empty array of arguments
-                        _argumentMatcher.IsMatch(FilterArguments(method, setupArguments.Skip(argumentsToSkip)), 
-                            FilterArguments(method, actualArguments.Skip(argumentsToSkip))));
+            if (!method.IsStatic)
+            {
+                itemsToSkip = 1;
+
+                if (!_targetMatcher.IsMatch(method.DeclaringType, setupArguments[0], actualArguments[0]))
+                {
+                    return false;
+                }
+            }
+
+            bool argumentsMatch = actualArguments.Length == itemsToSkip || _argumentMatcher.IsMatch(
+                                      FilterArguments(method, setupArguments.Skip(itemsToSkip)),
+                                      FilterArguments(method, actualArguments.Skip(itemsToSkip)));
+
+            return argumentsMatch;
         }
 
         private static IEnumerable<T> FilterArguments<T>(MethodBase method, IEnumerable<T> items)
@@ -82,7 +93,7 @@ namespace Smocks.Setups
             int i = 0;
             foreach (var item in items)
             {
-                if (!parameters[i].IsOut)
+                if (parameters.Length <= i || parameters[i].IsOut == false)
                 {
                     yield return item;
                 }
