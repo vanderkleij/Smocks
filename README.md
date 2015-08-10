@@ -21,10 +21,14 @@ Smock.Run(context =>
 ```C#
 Smock.Run(context =>
 {
-    context.Setup(() => Dns.GetHostName()).Returns("Smocks");
+    int fortytwo = 42;
+    context.Setup(() => int.TryParse("forty-two", out fortytwo)).Returns(true);
 
-    // Outputs "Smocks"
-    Console.WriteLine(Dns.GetHostName());
+    int outResult;
+    bool result = int.TryParse("forty-two", out outResult);
+
+    // Outputs "True, 42"
+    Console.WriteLine("{0}, {1}", result, outResult);
 });
 ```
 
