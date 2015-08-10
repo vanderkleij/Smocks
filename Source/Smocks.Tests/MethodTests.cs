@@ -87,6 +87,19 @@ namespace Smocks.Tests
             });
         }
 
+        [TestCase]
+        public void Setup_ValueTypeMethodWithArguments_InvokesOriginalMethodWhenNotMatched()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => It.IsAny<int>().ToString("NonExistantFormat")).Returns("Test");
+
+                string result = 42.ToString("X");
+
+                Assert.AreEqual("2A", result);
+            });
+        }
+
         private static void VoidMethod(string arg)
         {
             _voidMethodInvoked = true;

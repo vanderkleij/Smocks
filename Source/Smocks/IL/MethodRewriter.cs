@@ -202,11 +202,13 @@ namespace Smocks.IL
             Instruction instruction;
             Instruction firstInstruction = null;
 
-            foreach (var variable in variables)
+            for (int i = 0; i < variables.Count; ++i)
             {
+                var variable = variables[i];
+
                 // If we're calling an instance method of a value type, we need to put the
-                // *address* of the variable on the stack.
-                if (context.Method.HasThis && context.Method.DeclaringType.IsValueType)
+                // *address* of the instance on the stack.
+                if (i == 0 && context.Method.HasThis && context.Method.DeclaringType.IsValueType)
                 {
                     instruction = context.Insert(Instruction.Create(OpCodes.Ldloca, variable));
                 }
