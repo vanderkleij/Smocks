@@ -1,25 +1,25 @@
 #region License
 //// The MIT License (MIT)
-//// 
+////
 //// Copyright (c) 2015 Tom van der Kleij
-//// 
+////
 //// Permission is hereby granted, free of charge, to any person obtaining a copy of
 //// this software and associated documentation files (the "Software"), to deal in
 //// the Software without restriction, including without limitation the rights to
 //// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 //// the Software, and to permit persons to whom the Software is furnished to do so,
 //// subject to the following conditions:
-//// 
+////
 //// The above copyright notice and this permission notice shall be included in all
 //// copies or substantial portions of the Software.
-//// 
+////
 //// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 //// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 //// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#endregion
+#endregion License
 
 using System.Collections.Generic;
 using Mono.Cecil;
@@ -44,60 +44,6 @@ namespace Smocks.IL
                     yield return new VariableUsage(variableIndex, instruction, VariableOperation.Write);
                 }
             }
-        }
-
-        private bool WritesVariable(Instruction instruction, out int variableIndex)
-        {
-            variableIndex = -1;
-
-            switch (instruction.OpCode.Code)
-            {
-                case Code.Stloc:
-                case Code.Stloc_S:
-                    variableIndex = ((VariableReference)instruction.Operand).Index;
-                    return true;
-                case Code.Stloc_0:
-                    variableIndex = 0;
-                    return true;
-                case Code.Stloc_1:
-                    variableIndex = 1;
-                    return true;
-                case Code.Stloc_2:
-                    variableIndex = 2;
-                    return true;
-                case Code.Stloc_3:
-                    variableIndex = 3;
-                    return true;
-            }
-
-            return false;
-        }
-
-        private bool ReadsVariable(Instruction instruction, out int variableIndex)
-        {
-            variableIndex = -1;
-
-            switch (instruction.OpCode.Code)
-            {
-                case Code.Ldloc:
-                case Code.Ldloc_S:
-                    variableIndex = ((VariableReference)instruction.Operand).Index;
-                    return true;
-                case Code.Ldloc_0:
-                    variableIndex = 0;
-                    return true;
-                case Code.Ldloc_1:
-                    variableIndex = 1;
-                    return true;
-                case Code.Ldloc_2:
-                    variableIndex = 2;
-                    return true;
-                case Code.Ldloc_3:
-                    variableIndex = 3;
-                    return true;
-            }
-
-            return false;
         }
 
         public bool ReadsParameter(MethodReference method, Instruction instruction,
@@ -154,6 +100,68 @@ namespace Smocks.IL
             {
                 calledMethod = (MethodReference)instruction.Operand;
                 return true;
+            }
+
+            return false;
+        }
+
+        private bool ReadsVariable(Instruction instruction, out int variableIndex)
+        {
+            variableIndex = -1;
+
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Ldloc:
+                case Code.Ldloc_S:
+                    variableIndex = ((VariableReference)instruction.Operand).Index;
+                    return true;
+
+                case Code.Ldloc_0:
+                    variableIndex = 0;
+                    return true;
+
+                case Code.Ldloc_1:
+                    variableIndex = 1;
+                    return true;
+
+                case Code.Ldloc_2:
+                    variableIndex = 2;
+                    return true;
+
+                case Code.Ldloc_3:
+                    variableIndex = 3;
+                    return true;
+            }
+
+            return false;
+        }
+
+        private bool WritesVariable(Instruction instruction, out int variableIndex)
+        {
+            variableIndex = -1;
+
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Stloc:
+                case Code.Stloc_S:
+                    variableIndex = ((VariableReference)instruction.Operand).Index;
+                    return true;
+
+                case Code.Stloc_0:
+                    variableIndex = 0;
+                    return true;
+
+                case Code.Stloc_1:
+                    variableIndex = 1;
+                    return true;
+
+                case Code.Stloc_2:
+                    variableIndex = 2;
+                    return true;
+
+                case Code.Stloc_3:
+                    variableIndex = 3;
+                    return true;
             }
 
             return false;

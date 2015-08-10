@@ -21,10 +21,7 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion License
 
-using System;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Smocks.Injection;
 using Smocks.Utility;
 
@@ -36,9 +33,9 @@ namespace Smocks.Setups
     /// </summary>
     public class Interceptor
     {
+        private readonly IExpressionHelper _expressionHelper;
         private readonly IInvocationTracker _invocationTracker;
         private readonly ISetupMatcher _setupMatcher;
-        private readonly IExpressionHelper _expressionHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Interceptor" /> class.
@@ -121,21 +118,6 @@ namespace Smocks.Setups
             return new InterceptorResult(true);
         }
 
-        private void HandleSetup(object[] arguments, IInternalSetupBase setup, MethodBase originalMethod)
-        {
-            if (setup.Exception != null)
-            {
-                throw setup.Exception.Value;
-            }
-
-            if (setup.CallbackAction != null)
-            {
-                setup.CallbackAction(arguments);
-            }
-
-            HandleOutParameters(arguments, setup, originalMethod);
-        }
-
         private void HandleOutParameters(object[] arguments, IInternalSetupBase setup, MethodBase originalMethod)
         {
             ParameterInfo[] parameters = originalMethod.GetParameters();
@@ -149,6 +131,21 @@ namespace Smocks.Setups
                     arguments[i + offset] = _expressionHelper.GetValue(setup.MethodCall.Arguments[i + offset]);
                 }
             }
+        }
+
+        private void HandleSetup(object[] arguments, IInternalSetupBase setup, MethodBase originalMethod)
+        {
+            if (setup.Exception != null)
+            {
+                throw setup.Exception.Value;
+            }
+
+            if (setup.CallbackAction != null)
+            {
+                setup.CallbackAction(arguments);
+            }
+
+            HandleOutParameters(arguments, setup, originalMethod);
         }
     }
 }

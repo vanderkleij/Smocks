@@ -87,7 +87,7 @@ namespace Smocks.IL.Visitors
                     return 3;
             }
 
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override int VisitInlineMethod(Instruction instruction, MethodReference operand)

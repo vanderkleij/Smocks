@@ -1,5 +1,4 @@
 ﻿#region License
-
 //// The MIT License (MIT)
 ////
 //// Copyright (c) 2015 Tom van der Kleij
@@ -20,7 +19,6 @@
 //// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 #endregion License
 
 using System.Diagnostics.CodeAnalysis;
@@ -30,6 +28,12 @@ namespace Smocks.Tests.TestUtility
     [ExcludeFromCodeCoverage]
     internal class TestFunctions
     {
+        public static bool StringOutParameter(string arg1, out string arg2)
+        {
+            arg2 = arg1;
+            return false;
+        }
+
         internal static T EightArguments<T>(T arg1, T arg2, T arg3, T arg4, T arg5, T arg6,
             T arg7, T arg8)
         {
@@ -64,6 +68,17 @@ namespace Smocks.Tests.TestUtility
             return arg1;
         }
 
+        internal static bool IntRefParameter(string arg1, ref int arg2)
+        {
+            arg2 += 10;
+            return false;
+        }
+
+        internal static bool LongRefParameter(string arg1, ref long arg2)
+        {
+            return false;
+        }
+
         internal static T NineArguments<T>(T arg1, T arg2, T arg3, T arg4, T arg5, T arg6,
             T arg7, T arg8, T arg9)
         {
@@ -90,6 +105,11 @@ namespace Smocks.Tests.TestUtility
             T arg7, T arg8, T arg9, T arg10, T arg11, T arg12, T arg13, T arg14, T arg15, T arg16)
         {
             return arg1;
+        }
+
+        internal static bool StringRefParameter(string arg1, ref string arg2)
+        {
+            return false;
         }
 
         internal static T TenArguments<T>(T arg1, T arg2, T arg3, T arg4, T arg5, T arg6,

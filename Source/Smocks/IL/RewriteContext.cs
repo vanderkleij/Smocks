@@ -59,25 +59,11 @@ namespace Smocks.IL
             get { return OriginalInstruction.Previous; }
         }
 
-        public void Replace(Instruction target, IEnumerable<Instruction> instructions)
-        {
-            InsertAfter(target, instructions);
-            Processor.Remove(target);
-        }
-
         public void InsertAfter(Instruction target, IEnumerable<Instruction> instructions)
         {
             foreach (var instruction in instructions.Reverse())
             {
                 Processor.InsertAfter(target, instruction);
-            }
-        }
-
-        public void InsertBefore(Instruction target, IEnumerable<Instruction> instructions)
-        {
-            foreach (var instruction in instructions)
-            {
-                Processor.InsertBefore(target, instruction);
             }
         }
 

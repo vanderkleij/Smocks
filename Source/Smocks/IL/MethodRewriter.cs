@@ -105,6 +105,7 @@ namespace Smocks.IL
 
                 importedReplacement = boundMethod;
             }
+
             return importedReplacement;
         }
 
@@ -148,6 +149,35 @@ namespace Smocks.IL
             }
 
             return typeReference;
+        }
+
+        private static TypeReference StripByReference(RewriteContext context, TypeReference type)
+        {
+            return context.Method.Module.Import(type.Resolve());
+        }
+
+        private void CopyReferenceParametersToAddress(RewriteContext context,
+            VariableDefinition arrayVariable, List<VariableDefinition> variables)
+        {
+            for (int i = 0; i < variables.Count; ++i)
+            {
+                if (variables[i].VariableType.IsByReference)
+                {
+                    var variableType = StripByReference(context, variables[i].VariableType);
+
+                    // Push address
+                    context.Insert(Instruction.Create(OpCodes.Ldloc, variables[i]));
+
+                    // Push value from arguments array
+                    context.Insert(Instruction.Create(OpCodes.Ldloc, arrayVariable));
+                    context.Insert(Instruction.Create(OpCodes.Ldc_I4, i));
+                    context.Insert(Instruction.Create(OpCodes.Ldelem_Any, context.Method.Module.Import(typeof(object))));
+                    context.Insert(Instruction.Create(OpCodes.Unbox_Any, variableType));
+
+                    // Copy value to address
+                    context.Insert(Instruction.Create(OpCodes.Stind_Ref));
+                }
+            }
         }
 
         private TypeReference GetInterceptorResultType(MethodReference method, bool isVoidMethod)
@@ -265,30 +295,6 @@ namespace Smocks.IL
             context.Processor.Remove(context.OriginalInstruction);
         }
 
-        private void CopyReferenceParametersToAddress(RewriteContext context, 
-            VariableDefinition arrayVariable, List<VariableDefinition> variables)
-        {
-            for (int i = 0; i < variables.Count; ++i)
-            {
-                if (variables[i].VariableType.IsByReference)
-                {
-                    var variableType = StripByReference(context, variables[i].VariableType);
-
-                    // Push address
-                    context.Insert(Instruction.Create(OpCodes.Ldloc, variables[i]));
-
-                    // Push value from arguments array
-                    context.Insert(Instruction.Create(OpCodes.Ldloc, arrayVariable));
-                    context.Insert(Instruction.Create(OpCodes.Ldc_I4, i));
-                    context.Insert(Instruction.Create(OpCodes.Ldelem_Any, context.Method.Module.Import(typeof(object))));
-                    context.Insert(Instruction.Create(OpCodes.Unbox_Any, variableType));
-
-                    // Copy value to address
-                    context.Insert(Instruction.Create(OpCodes.Stind_Ref));
-                }
-            }
-        }
-
         private List<VariableDefinition> StoreArgumentsInVariables(RewriteContext context)
         {
             List<TypeReference> parameters = GetParameters(context.Method);
@@ -352,17 +358,11 @@ namespace Smocks.IL
                 {
                     context.Insert(Instruction.Create(OpCodes.Box, variableType));
                 }
-                
 
                 context.Insert(Instruction.Create(OpCodes.Stelem_Ref));
             }
 
             return arrayVariable;
-        }
-
-        private static TypeReference StripByReference(RewriteContext context, TypeReference type)
-        {
-            return context.Method.Module.Import(type.Resolve());
         }
     }
 }

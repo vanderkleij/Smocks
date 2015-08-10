@@ -1,25 +1,25 @@
 ﻿#region License
 //// The MIT License (MIT)
-//// 
+////
 //// Copyright (c) 2015 Tom van der Kleij
-//// 
+////
 //// Permission is hereby granted, free of charge, to any person obtaining a copy of
 //// this software and associated documentation files (the "Software"), to deal in
 //// the Software without restriction, including without limitation the rights to
 //// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 //// the Software, and to permit persons to whom the Software is furnished to do so,
 //// subject to the following conditions:
-//// 
+////
 //// The above copyright notice and this permission notice shall be included in all
 //// copies or substantial portions of the Software.
-//// 
+////
 //// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 //// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 //// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#endregion
+#endregion License
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -58,6 +58,23 @@ namespace Smocks.Setups
                 ArgumentsMatch(method, setup.MethodCall.Arguments, arguments));
         }
 
+        private static IEnumerable<T> FilterArguments<T>(MethodBase method, IEnumerable<T> items)
+        {
+            var parameters = method.GetParameters();
+
+            // We skip out parameters as these don't have to be matched.
+            int i = 0;
+            foreach (var item in items)
+            {
+                if (parameters.Length <= i || parameters[i].IsOut == false)
+                {
+                    yield return item;
+                }
+
+                ++i;
+            }
+        }
+
         private bool ArgumentsMatch(MethodBase method,
             ReadOnlyCollection<Expression> setupArguments, object[] actualArguments)
         {
@@ -83,23 +100,6 @@ namespace Smocks.Setups
                                       FilterArguments(method, actualArguments.Skip(itemsToSkip)));
 
             return argumentsMatch;
-        }
-
-        private static IEnumerable<T> FilterArguments<T>(MethodBase method, IEnumerable<T> items)
-        {
-            var parameters = method.GetParameters();
-            
-            // We skip out parameters as these don't have to be matched.
-            int i = 0;
-            foreach (var item in items)
-            {
-                if (parameters.Length <= i || parameters[i].IsOut == false)
-                {
-                    yield return item;
-                }
-
-                ++i;
-            }
         }
     }
 }

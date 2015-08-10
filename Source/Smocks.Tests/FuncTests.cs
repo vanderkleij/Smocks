@@ -120,7 +120,7 @@ namespace Smocks.Tests
             Assert.AreEqual(expected, value);
         }
 
-        [TestCase((int)1)]
+        [TestCase(1)]
         public void Run_IntFunc_ReturnsCorrectValue(int expected)
         {
             int value = Smock.Run(context =>

@@ -32,36 +32,36 @@ namespace Smocks.Tests
 {
     [ExcludeFromCodeCoverage]
     [TestFixture]
-    public class OutParameterTests
+    public class RefParameterTests
     {
         [TestCase]
-        public void Setup_MatchWithInt32OutParameter_SetsOutParameterToSetupValue()
+        public void Setup_MatchWithInt32RefParameter_ReturnsConfiguredValue()
         {
             Smock.Run(context =>
             {
-                int expectedOutResult = 10;
-                context.Setup(() => int.TryParse(It.IsAny<string>(), out expectedOutResult)).Returns(true);
+                int refSetupValue = 10;
+                context.Setup(() => TestFunctions.IntRefParameter(It.IsAny<string>(), ref refSetupValue)).Returns(true);
 
-                int outResult;
-                bool result = int.TryParse("InvalidNumber", out outResult);
+                int refValue = refSetupValue;
+                bool result = TestFunctions.IntRefParameter("SomeString", ref refValue);
 
-                Assert.AreEqual(expectedOutResult, outResult);
+                Assert.AreEqual(10, refSetupValue);
                 Assert.AreEqual(true, result);
             });
         }
 
         [TestCase]
-        public void Setup_MatchWithInt64OutParameter_SetsOutParameterToSetupValue()
+        public void Setup_MatchWithInt64RefParameter_ReturnsConfiguredValue()
         {
             Smock.Run(context =>
             {
-                long expectedOutResult = 10;
-                context.Setup(() => long.TryParse(It.IsAny<string>(), out expectedOutResult)).Returns(true);
+                long refSetupValue = 42;
+                context.Setup(() => TestFunctions.LongRefParameter(It.IsAny<string>(), ref refSetupValue)).Returns(true);
 
-                long outResult;
-                bool result = long.TryParse("InvalidNumber", out outResult);
+                long refValue = refSetupValue;
+                bool result = TestFunctions.LongRefParameter("SomeString", ref refValue);
 
-                Assert.AreEqual(expectedOutResult, outResult);
+                Assert.AreEqual(42, refSetupValue);
                 Assert.AreEqual(true, result);
             });
         }
@@ -71,30 +71,31 @@ namespace Smocks.Tests
         {
             Smock.Run(context =>
             {
-                string expectedOutResult = "Foo";
-                context.Setup(() => TestFunctions.StringOutParameter(It.IsAny<string>(), out expectedOutResult)).Returns(true);
+                string refSetupValue = "Foo";
+                context.Setup(() => TestFunctions.StringRefParameter(It.IsAny<string>(), ref refSetupValue)).Returns(true);
 
-                string outResult;
-                bool result = TestFunctions.StringOutParameter("SomeValue", out outResult);
+                string refValue = refSetupValue;
+                bool result = TestFunctions.StringRefParameter("SomeString", ref refValue);
 
-                Assert.AreEqual(expectedOutResult, outResult);
+                Assert.AreEqual("Foo", refSetupValue);
                 Assert.AreEqual(true, result);
             });
         }
 
         [TestCase]
-        public void Setup_NoMatchWithValueTypeOutParameter_InvokesOriginalMethod()
+        public void Setup_NoMatchWithValueTypeRefParameter_InvokesOriginalMethod()
         {
             Smock.Run(context =>
             {
-                int expectedOutResult;
-                context.Setup(() => int.TryParse("SomeOtherValue", out expectedOutResult)).Returns(true);
+                int refSetupValue = 10;
+                context.Setup(() => TestFunctions.IntRefParameter(It.IsAny<string>(), ref refSetupValue)).Returns(true);
 
-                int outResult;
-                bool result = int.TryParse("200", out outResult);
+                int refValue = 100;
+                bool result = TestFunctions.IntRefParameter("SomeString", ref refValue);
 
-                Assert.AreEqual(200, outResult);
-                Assert.AreEqual(true, result);
+                // IntRefParameter adds 10 to the supplied value and returns false.
+                Assert.AreEqual(110, refValue);
+                Assert.AreEqual(false, result);
             });
         }
     }
