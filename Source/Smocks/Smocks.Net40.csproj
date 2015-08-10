@@ -126,6 +126,8 @@
     <Compile Include="IL\IILGenerator.cs" />
     <Compile Include="IL\IInstructionsCompiler.cs" />
     <Compile Include="IL\RewriteContext.cs" />
+    <Compile Include="IL\VariableOperation.cs" />
+    <Compile Include="IL\VariableUsage.cs" />
     <Compile Include="Injection\IServiceCreator.cs" />
     <Compile Include="Injection\IServiceLocator.cs" />
     <Compile Include="Injection\ServiceCreator.cs" />
@@ -160,6 +162,8 @@
     <Compile Include="Setups\IInternalSetup.Generic.cs" />
     <Compile Include="Setups\IInternalSetupBase.cs" />
     <Compile Include="Setups\IInvocationTracker.cs" />
+    <Compile Include="Setups\InterceptorResult.cs" />
+    <Compile Include="Setups\InterceptorResult.Generic.cs" />
     <Compile Include="Setups\InvocationTracker.cs" />
     <Compile Include="Setups\ISetupManager.cs" />
     <Compile Include="Setups\ISetupMatcher.cs" />
