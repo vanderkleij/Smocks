@@ -78,6 +78,7 @@ namespace Smocks.IL.Visitors
                 case Code.Box:
                 case Code.Ldfld:
                 case Code.Ldflda:
+                case Code.Dup:
                     return 1;
 
                 case Code.Stfld:

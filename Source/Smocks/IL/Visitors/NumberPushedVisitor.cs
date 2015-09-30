@@ -81,6 +81,8 @@ namespace Smocks.IL.Visitors
                 case Code.Ldloca_S:
                 case Code.Box:
                     return 1;
+                case Code.Dup:
+                    return 2;
             }
 
             throw new NotImplementedException(string.Format("Unexpected opcode: {0}", instruction.OpCode.Code));
