@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smocks.Net45", "Smocks\Smoc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smocks.Tests.Net45", "Smocks.Tests\Smocks.Tests.Net45.csproj", "{7E8E2112-B2F7-49A6-A628-5BECEC0C919F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smocks.Dummy.Net45", "Smocks.Dummy\Smocks.Dummy.Net45.csproj", "{89B26A82-4B5B-4A16-A8BB-277AD4F0DBF9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7E8E2112-B2F7-49A6-A628-5BECEC0C919F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E8E2112-B2F7-49A6-A628-5BECEC0C919F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E8E2112-B2F7-49A6-A628-5BECEC0C919F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89B26A82-4B5B-4A16-A8BB-277AD4F0DBF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89B26A82-4B5B-4A16-A8BB-277AD4F0DBF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89B26A82-4B5B-4A16-A8BB-277AD4F0DBF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89B26A82-4B5B-4A16-A8BB-277AD4F0DBF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

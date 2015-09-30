@@ -72,8 +72,12 @@ namespace Smocks.Tests.AppDomains
             loaderMock.Setup(loader => loader.Load()).Returns(expectedResult);
 
             _loadedAssemblyFinderMock
-                .Setup(finder => finder.Find(It.Is<AssemblyName>(name => name.Name == assemblyName)))
+                .Setup(finder => finder.Find(It.IsAny<AssemblyName>()))
                 .Returns(default(Assembly));
+
+            _assemblyLoaderFactoryMock
+                .Setup(factory => factory.GetLoaderForAssembly(It.IsAny<AssemblyName>()))
+                .Returns(default(IAssemblyLoader));
 
             _assemblyLoaderFactoryMock
                 .Setup(factory => factory.GetLoaderForAssembly(It.Is<AssemblyName>(name => name.Name == assemblyName)))

@@ -22,9 +22,11 @@
 #endregion
 
 using System;
+using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using Moq;
 using NUnit.Framework;
+using Smocks.Dummy;
 
 namespace Smocks.Tests
 {
@@ -97,6 +99,17 @@ namespace Smocks.Tests
                 string result = 42.ToString("X");
 
                 Assert.AreEqual("2A", result);
+            });
+        }
+
+        [TestCase]
+        public void Setup_SetupTargetInvokedFromDirectlyReferencedAssembly_IntercepsInvocation()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => DateTime.Now).Returns(new DateTime());
+                var result = StaticClass.TestDateTime();
+                Assert.AreEqual(new DateTime(), result);
             });
         }
 

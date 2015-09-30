@@ -151,9 +151,13 @@
     <Compile Include="VerifiableTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Smocks.Dummy\Smocks.Dummy.Net45.csproj">
+      <Project>{89b26a82-4b5b-4a16-a8bb-277ad4f0dbf9}</Project>
+      <Name>Smocks.Dummy.Net45</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Smocks\Smocks.Net45.csproj">
       <Project>{b62b3313-ce1e-40ba-8e58-23fc6ce89acf}</Project>
-      <Name>Smocks</Name>
+      <Name>Smocks.Net45</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

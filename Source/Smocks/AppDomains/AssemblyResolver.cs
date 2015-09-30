@@ -79,27 +79,40 @@ namespace Smocks.AppDomains
             try
             {
                 AssemblyName assemblyName = new AssemblyName(args.Name);
-
-                Assembly alreadyLoadedAssembly = _loadedAssemblyFinder.Find(assemblyName);
-                if (alreadyLoadedAssembly != null)
-                {
-                    return alreadyLoadedAssembly;
-                }
-
-                if (AssemblyLoaderFactory != null)
-                {
-                    IAssemblyLoader loader = AssemblyLoaderFactory.GetLoaderForAssembly(assemblyName);
-                    Assembly loadedAssembly = loader != null ? loader.Load() : null;
-
-                    return loadedAssembly;
-                }
-
-                return null;
+                return LoadAssembly(assemblyName);
             }
             finally
             {
                 AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
             }
+        }
+
+        /// <summary>
+        /// Loads an assembly and all its references.
+        /// </summary>
+        /// <param name="assemblyName">Name of the assembly.</param>
+        /// <returns>The assembly, or null if it could not be loaded.</returns>
+        private Assembly LoadAssembly(AssemblyName assemblyName)
+        {
+            Assembly result = _loadedAssemblyFinder.Find(assemblyName);
+
+            if (result != null || AssemblyLoaderFactory == null)
+            {
+                return result;
+            }
+
+            IAssemblyLoader loader = AssemblyLoaderFactory.GetLoaderForAssembly(assemblyName);
+            result = loader != null ? loader.Load() : null;
+
+            if (result != null)
+            {
+                foreach (var reference in result.GetReferencedAssemblies())
+                {
+                    LoadAssembly(reference);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>

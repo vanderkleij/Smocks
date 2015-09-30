@@ -171,13 +171,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Smocks.Dummy\Smocks.Dummy.Net40.csproj">
+      <Project>{89b26a82-4b5b-4a16-a8bb-277ad4f0dbf9}</Project>
+      <Name>Smocks.Dummy.Net40</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Smocks\Smocks.Net40.csproj">
       <Project>{b62b3313-ce1e-40ba-8e58-23fc6ce89acf}</Project>
       <Name>Smocks.Net40</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

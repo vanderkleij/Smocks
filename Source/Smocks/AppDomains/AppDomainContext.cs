@@ -73,7 +73,7 @@ namespace Smocks.AppDomains
             {
                 ApplicationBase = null,
                 PrivateBinPathProbe = "true",
-                LoaderOptimization = LoaderOptimization.MultiDomainHost
+                LoaderOptimization = LoaderOptimization.SingleDomain
             };
 
             _appDomain = AppDomain.CreateDomain("Smocks-" + Guid.NewGuid(), null, domainSetup);
