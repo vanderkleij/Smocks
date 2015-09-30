@@ -87,7 +87,7 @@ namespace Smocks.IL.Visitors
                     return 3;
             }
 
-            throw new NotImplementedException();
+            throw new NotImplementedException(string.Format("Unexpected opcode: {0}", instruction.OpCode.Code));
         }
 
         public override int VisitInlineMethod(Instruction instruction, MethodReference operand)
