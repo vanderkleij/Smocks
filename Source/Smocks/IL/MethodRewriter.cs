@@ -27,6 +27,7 @@ using System.Linq;
 using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
 using Smocks.IL.Resolvers;
 using Smocks.Setups;
 using Smocks.Utility;
@@ -267,6 +268,9 @@ namespace Smocks.IL
             bool isVoidMethod = context.Method.ReturnType.FullName == "System.Void" &&
                 !IsConstructor(context.Method);
 
+            // As per: https://groups.google.com/forum/#!topic/mono-cecil/v6LfFLj9eAE
+            context.Processor.Body.SimplifyMacros();
+
             List<VariableDefinition> variables = StoreArgumentsInVariables(context);
             VariableDefinition arrayVariable = StoreVariablesInObjectArray(context, variables);
             VariableDefinition interceptorResultVariable = InvokeReplacementMethod(context, arrayVariable, isVoidMethod);
@@ -295,6 +299,8 @@ namespace Smocks.IL
             });
 
             context.Processor.Remove(context.OriginalInstruction);
+            
+            context.Processor.Body.OptimizeMacros();
         }
 
         private List<VariableDefinition> StoreArgumentsInVariables(RewriteContext context)

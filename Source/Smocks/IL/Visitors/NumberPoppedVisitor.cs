@@ -65,6 +65,7 @@ namespace Smocks.IL.Visitors
                 case Code.Ldloca_S:
                 case Code.Newobj:
                 case Code.Nop:
+                case Code.Br:
                     return 0;
 
                 case Code.Newarr:
@@ -79,13 +80,25 @@ namespace Smocks.IL.Visitors
                 case Code.Ldfld:
                 case Code.Ldflda:
                 case Code.Dup:
+                case Code.Brtrue:
+                case Code.Brtrue_S:
+                case Code.Brfalse:
+                case Code.Brfalse_S:
+                case Code.Pop:
+                case Code.Ret:
                     return 1;
 
                 case Code.Stfld:
+                case Code.Ceq:
                     return 2;
 
                 case Code.Stelem_Ref:
                     return 3;
+
+                case Code.Call:
+                case Code.Calli:
+                case Code.Callvirt:
+                    return VisitInlineMethod(instruction, (MethodReference)instruction.Operand);
             }
 
             throw new NotImplementedException(string.Format("Unexpected opcode: {0}", instruction.OpCode.Code));
