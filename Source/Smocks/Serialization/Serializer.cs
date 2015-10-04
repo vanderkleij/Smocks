@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Smocks.Serialization
 {
@@ -85,7 +86,17 @@ namespace Smocks.Serialization
             return target
                 .GetType()
                 .GetFields()
+                .Where(field => IsSerializable(field.FieldType))
                 .ToDictionary(field => field.Name, field => field.GetValue(target));
+        }
+
+        private bool IsSerializable(Type fieldType)
+        {
+            bool isDelegate = typeof(Delegate).IsAssignableFrom(fieldType);
+            bool isProxy = typeof (MarshalByRefObject).IsAssignableFrom(fieldType);
+            bool result = (fieldType.IsSerializable || isProxy) && !isDelegate;
+
+            return result;
         }
     }
 }

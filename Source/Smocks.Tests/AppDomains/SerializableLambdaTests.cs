@@ -59,37 +59,24 @@ namespace Smocks.Tests.AppDomains
         public void Create_ActionWithTarget_SetsTypeAndMethodAndSerializesTarget()
         {
             int capturedInt = 42;
+            Action lambda = () => Console.WriteLine(capturedInt);
 
             _serializerMock
-                .Setup(serializer => serializer.Serialize(Moq.It.Is<object>(target => VerifyFields(target, this, 42))))
+                .Setup(serializer => serializer.Serialize(lambda.Target))
                 .Returns(new Dictionary<string, object>());
 
-            var result = SerializableLambda.Create(() => Console.WriteLine(capturedInt), _serializerMock.Object);
+            var result = SerializableLambda.Create(lambda, _serializerMock.Object);
 
             Assert.NotNull(result.TargetType);
-            Assert.AreEqual(GetType(), result.TargetType.DeclaringType);
+            Assert.AreEqual(lambda.Target.GetType(), result.TargetType);
             Assert.NotNull(result.Method);
-            Assert.AreEqual(GetType(), result.Method.DeclaringType.DeclaringType);
+            Assert.AreEqual(lambda.Method, result.Method);
         }
 
         [SetUp]
         public void Setup()
         {
             _serializerMock = new Mock<ISerializer>(MockBehavior.Strict);
-        }
-
-        private bool VerifyFields(object target, params object[] values)
-        {
-            var fields = target.GetType().GetFields();
-
-            if (fields.Length != values.Length)
-            {
-                return false;
-            }
-
-            var fieldValues = fields.Select(field => field.GetValue(target)).ToList();
-            bool result = values.All(value => fieldValues.Contains(value));
-            return result;
         }
     }
 }

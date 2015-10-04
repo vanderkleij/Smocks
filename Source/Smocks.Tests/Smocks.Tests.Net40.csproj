@@ -122,6 +122,7 @@
     <Compile Include="Injection\ServiceCreatorTests.cs" />
     <Compile Include="Injection\ServiceLocatorContainerTests.cs" />
     <Compile Include="Injection\ServiceLocatorTests.cs" />
+    <Compile Include="Issues\IssueEightTests.cs" />
     <Compile Include="Logging\LoggerExtensionsTests.cs" />
     <Compile Include="MethodTests.cs" />
     <Compile Include="OutParameterTests.cs" />

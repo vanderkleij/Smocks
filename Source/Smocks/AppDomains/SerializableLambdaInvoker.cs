@@ -62,7 +62,8 @@ namespace Smocks.AppDomains
 
             TReturnValue returnValue = Transform((TReturnValue)rawReturnValue);
 
-            return new InvocationResult<TReturnValue>(serializer.Serialize(target), returnValue);
+            var serialized = serializer.Serialize(target);
+            return new InvocationResult<TReturnValue>(serialized, returnValue);
         }
 
         private static IEnumerable<IReturnValueTransformer> DiscoverDefaultReturnValueTransformers()
