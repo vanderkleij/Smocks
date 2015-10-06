@@ -96,5 +96,21 @@ namespace Smocks.Tests
                 Assert.AreEqual(2, Enumerable.Range(2, 2).Count());
             });
         }
+
+        [TestCase]
+        public void Setup_ParamsArray_MatchesWhenElementsInArrayMatch()
+        {
+            // params arrays are a strange beast: normally we only match reference 
+            // types (such as arrays) when they are the *same* (ReferenceEquals).
+            // For params arrays, we shouldn't actually treat them as array but match
+            // their individual elements instead.
+            Smock.Run(context =>
+            {
+                context.Setup(() => string.Format(string.Empty, "a", 1, 2, 3, 4)).Returns("It works!");
+
+                var result = string.Format(string.Empty, "a", 1, 2, 3, 4);
+                Assert.AreEqual("It works!", result);
+            });
+        }
     }
 }

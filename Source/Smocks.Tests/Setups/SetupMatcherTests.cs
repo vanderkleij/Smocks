@@ -94,10 +94,10 @@ namespace Smocks.Tests.Setups
             var subject = new SetupMatcher(_setupManagerMock.Object,
                 _targetMatcherMock.Object, _argumentMatcherMock.Object);
 
-            var method = ReflectionUtility.GetMethod(() => "Test".Trim('c'));
-            var arguments = new object[] { "Test", 'c' }; // First argument is the target
+            var method = ReflectionUtility.GetMethod(() => "Test".IndexOf("c"));
+            var arguments = new object[] { "Test", "c" }; // First argument is the target
 
-            var setups = TestDataFactory.CreateSetups(() => "Test".Trim('c'));
+            var setups = TestDataFactory.CreateSetups(() => "Test".IndexOf("c"));
             _setupManagerMock.Setup(manager => manager.GetSetupsForMethod(method))
                 .Returns(setups);
 
@@ -152,10 +152,10 @@ namespace Smocks.Tests.Setups
             var subject = new SetupMatcher(_setupManagerMock.Object,
                 _targetMatcherMock.Object, _argumentMatcherMock.Object);
 
-            var method = ReflectionUtility.GetMethod(() => Console.WriteLine());
+            var method = ReflectionUtility.GetMethod(() => Console.WriteLine(string.Empty));
             var arguments = new object[] { "Test" };
 
-            var setups = TestDataFactory.CreateSetups(() => Console.WriteLine(), () => Console.WriteLine());
+            var setups = TestDataFactory.CreateSetups(() => Console.WriteLine(string.Empty), () => Console.WriteLine(string.Empty));
             _setupManagerMock.Setup(manager => manager.GetSetupsForMethod(method))
                 .Returns(setups);
 

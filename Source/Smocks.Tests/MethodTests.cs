@@ -24,6 +24,7 @@
 using System;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using Moq;
 using NUnit.Framework;
 using Smocks.Dummy;
@@ -103,6 +104,30 @@ namespace Smocks.Tests
         }
 
         [TestCase]
+        public void Setup_SetupConfiguredFromPrivateMethodInSameClass_ReturnsConfiguredValue()
+        {
+            Smock.Run(context =>
+            {
+                DoSetup(context);
+
+                var actual = string.Format(string.Empty);
+                Assert.AreEqual("Some value", actual);
+            });
+        }
+
+        [TestCase]
+        public void Setup_SetupIndirectlyConfiguredFromPrivateMethodInSameClass_ReturnsConfiguredValue()
+        {
+            Smock.Run(context =>
+            {
+                DoSetupIndirectly(context);
+
+                var actual = string.Format(string.Empty);
+                Assert.AreEqual("Some value", actual);
+            });
+        }
+
+        [TestCase]
         public void Setup_SetupTargetInvokedFromDirectlyReferencedAssembly_IntercepsInvocation()
         {
             Smock.Run(context =>
@@ -116,6 +141,16 @@ namespace Smocks.Tests
         private static void VoidMethod(string arg)
         {
             _voidMethodInvoked = true;
+        }
+
+        private static void DoSetup(ISmocksContext context)
+        {
+            context.Setup(() => string.Format(string.Empty)).Returns("Some value");
+        }
+
+        private static void DoSetupIndirectly(ISmocksContext context)
+        {
+            DoSetup(context);
         }
     }
 }

@@ -21,6 +21,8 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion License
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -54,25 +56,47 @@ namespace Smocks.Setups
             ReadOnlyCollection<IInternalSetup> setups = _setupManager.GetSetupsForMethod(method);
 
             // Reverse so that the last setup that matches is selected.
-            return setups.Reverse().FirstOrDefault(setup =>
-                ArgumentsMatch(method, setup.MethodCall.Arguments, arguments));
+            return setups.Reverse().FirstOrDefault(setup => ArgumentsMatch(method, setup.MethodCall.Arguments, arguments));
         }
 
-        private static IEnumerable<T> FilterArguments<T>(MethodBase method, IEnumerable<T> items)
+        private static IEnumerable<T> FilterArguments<T>(
+            MethodBase method, 
+            IEnumerable<T> items, 
+            Func<T, IEnumerable<T>> arrayExpander)
         {
             var parameters = method.GetParameters();
 
-            // We skip out parameters as these don't have to be matched.
             int i = 0;
             foreach (var item in items)
             {
-                if (parameters.Length <= i || parameters[i].IsOut == false)
+                // We skip out/ref parameters as these don't have to be matched.
+                bool isOutParameter = i < parameters.Length && parameters[i].IsOut;
+                if (!isOutParameter)
                 {
-                    yield return item;
+                    // Params arrays aren't actually arrays from our perspective: we should treat each
+                    // element in them as a single argument and match those individually, instead
+                    // of checking whether the whole array reference is the same. We therefore
+                    // expand params arrays to their contents here.
+                    if (IsParamsArray(parameters[i]))
+                    {
+                        foreach (var expandedItem in arrayExpander(item))
+                        {
+                            yield return expandedItem;
+                        }
+                    }
+                    else
+                    {
+                        yield return item;
+                    }
                 }
 
                 ++i;
             }
+        }
+
+        private static bool IsParamsArray(ParameterInfo parameterInfo)
+        {
+            return parameterInfo.GetCustomAttributes(typeof(ParamArrayAttribute), true).Any();
         }
 
         private bool ArgumentsMatch(MethodBase method,
@@ -95,11 +119,21 @@ namespace Smocks.Setups
                 }
             }
 
-            bool argumentsMatch = actualArguments.Length == itemsToSkip || _argumentMatcher.IsMatch(
-                                      FilterArguments(method, setupArguments.Skip(itemsToSkip)),
-                                      FilterArguments(method, actualArguments.Skip(itemsToSkip)));
+            var filteredExpressions = FilterArguments(method, setupArguments.Skip(itemsToSkip), ExpandArrayExpression);
+            var filteredObjects = FilterArguments(method, actualArguments.Skip(itemsToSkip), ExpandObjectArray);
+            bool argumentsMatch = actualArguments.Length == itemsToSkip || _argumentMatcher.IsMatch(filteredExpressions, filteredObjects);
 
             return argumentsMatch;
+        }
+
+        private static IEnumerable<object> ExpandObjectArray(object array)
+        {
+            return ((IEnumerable)array).Cast<object>();
+        }
+
+        private static IEnumerable<Expression> ExpandArrayExpression(Expression expression)
+        {
+            return ((NewArrayExpression)expression).Expressions;
         }
     }
 }

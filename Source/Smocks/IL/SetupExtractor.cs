@@ -1,35 +1,38 @@
 ﻿#region License
+
 //// The MIT License (MIT)
-//// 
+////
 //// Copyright (c) 2015 Tom van der Kleij
-//// 
+////
 //// Permission is hereby granted, free of charge, to any person obtaining a copy of
 //// this software and associated documentation files (the "Software"), to deal in
 //// the Software without restriction, including without limitation the rights to
 //// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 //// the Software, and to permit persons to whom the Software is furnished to do so,
 //// subject to the following conditions:
-//// 
+////
 //// The above copyright notice and this permission notice shall be included in all
 //// copies or substantial portions of the Software.
-//// 
+////
 //// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 //// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 //// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#endregion
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
+#endregion License
+
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Smocks.Exceptions;
 using Smocks.Setups;
 using Smocks.Utility;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using MethodBody = Mono.Cecil.Cil.MethodBody;
 
 namespace Smocks.IL
 {
@@ -61,37 +64,71 @@ namespace Smocks.IL
             List<MethodDefinition> setupMethods = _setupMethods.Select(setupMethod =>
                 disassembleResult.ModuleDefinition.Import(setupMethod).Resolve()).ToList();
 
-            foreach (var instruction in disassembleResult.Body.Instructions)
+            return GetSetupsFromInstructions(target, disassembleResult.Body, setupMethods);
+        }
+
+        private IEnumerable<SetupTarget> GetSetupsFromInstructions(object target, MethodBody body, List<MethodDefinition> setupMethods)
+        {
+            foreach (var instruction in body.Instructions)
             {
-                if (instruction.OpCode == OpCodes.Callvirt)
+                if (instruction.OpCode != OpCodes.Callvirt && instruction.OpCode != OpCodes.Call)
                 {
-                    var operandMethod = ((MethodReference)instruction.Operand).Resolve();
+                    continue;
+                }
 
-                    if (setupMethods.Contains(operandMethod))
+                var operandMethod = ((MethodReference)instruction.Operand).Resolve();
+
+                if (setupMethods.Contains(operandMethod))
+                {
+                    Expression expression = _expressionDecompiler.Decompile(body, instruction, target);
+
+                    if (expression == null)
                     {
-                        Expression expression = _expressionDecompiler.Decompile(
-                            disassembleResult.Body, instruction, target);
+                        // This should not happen. When this happens it's most likely
+                        // a bug in the expression decompiler.
+                        throw new SetupExtractionException("Could not extract expression");
+                    }
 
-                        if (expression == null)
+                    var methodCall = _expressionHelper.GetMethod(expression);
+
+                    if (methodCall == null)
+                    {
+                        string message = string.Format(
+                            "Could not extract method from expression {0}", expression);
+                        throw new SetupExtractionException(message);
+                    }
+
+                    yield return new SetupTarget(expression, methodCall.Method);
+                }
+                else
+                {
+                    bool inSameClass = InSameClass(operandMethod.DeclaringType, body.Method.DeclaringType);
+                    if (inSameClass && operandMethod != body.Method && operandMethod.Body != null)
+                    {
+                        foreach (var setup in GetSetupsFromInstructions(target, operandMethod.Body, setupMethods))
                         {
-                            // This should not happen. When this happens it's most likely
-                            // a bug in the expression decompiler.
-                            throw new SetupExtractionException("Could not extract expression");
+                            yield return setup;
                         }
-
-                        var methodCall = _expressionHelper.GetMethod(expression);
-
-                        if (methodCall == null)
-                        {
-                            string message = string.Format(
-                                "Could not extract method from expression {0}", expression);
-                            throw new SetupExtractionException(message);
-                        }
-
-                        yield return new SetupTarget(expression, methodCall.Method);
                     }
                 }
             }
+        }
+
+        private static bool InSameClass(TypeDefinition first, TypeDefinition second)
+        {
+            return GetRoot(first) == GetRoot(second);
+        }
+
+        private static TypeDefinition GetRoot(TypeDefinition type)
+        {
+            TypeDefinition result = type;
+
+            while (result.DeclaringType != null)
+            {
+                result = result.DeclaringType;
+            }
+
+            return result;
         }
 
         public IEnumerable<SetupTarget> GetSetups(MethodBase method)
