@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Linq;
 using Smocks.Utility;
 
 namespace Smocks.Setups
@@ -82,7 +83,7 @@ namespace Smocks.Setups
 
             if (ReturnValueGenerator != null)
             {
-                return ReturnValueGenerator(arguments);
+                return ReturnValueGenerator(arguments.Skip(ArgumentsToSkipInCallbacks).ToArray());
             }
 
             throw new InvalidOperationException("No return value specified");

@@ -36,6 +36,44 @@ namespace Smocks.Tests
     public class ReturnsCallbackTests
     {
         [TestCase]
+        public void ReturnsCallback_ConstructorWithArguments_ReturnsResultFromCallback()
+        {
+            Smock.Run(context =>
+            {
+                context
+                    .Setup(() => new Exception(It.IsAny<string>()))
+                    .Returns<string>(arg => new ArgumentException(arg + "Bar"));
+
+                var actual = new Exception("Foo");
+
+                Assert.IsTrue(actual is ArgumentException);
+                Assert.AreEqual("FooBar", actual.Message);
+            });
+        }
+
+        [TestCase]
+        public void ReturnsCallback_InstanceMethodWithOneArgument_ReturnsResultFromCallback()
+        {
+            Smock.Run(context =>
+            {
+                string argument = null;
+
+                context
+                    .Setup(() => It.IsAny<string>().Contains(It.IsAny<string>()))
+                    .Returns<string>(arg => 
+                    {
+                        argument = arg;
+                        return true;
+                    });
+
+                bool result = "Foo".Contains("Bar");
+
+                Assert.AreEqual("Bar", argument);
+                Assert.IsTrue(result);
+            });
+        }
+
+        [TestCase]
         public void ReturnsCallback_EightMatchingArgs_ReturnsResultFromCallback()
         {
             Smock.Run(context =>
@@ -169,9 +207,9 @@ namespace Smocks.Tests
         {
             Smock.Run(context =>
             {
-                context.Setup(() => 2.ToString()).Returns<double>(d => (d * d).ToString(CultureInfo.InvariantCulture));
+                context.Setup(() => string.Copy(It.IsAny<string>())).Returns<double>(d => (d * d).ToString(CultureInfo.InvariantCulture));
 
-                Assert.AreEqual("4", 2.ToString());
+                Assert.AreEqual("4", string.Copy("2"));
             });
         }
 
@@ -220,9 +258,9 @@ namespace Smocks.Tests
         {
             Smock.Run(context =>
             {
-                context.Setup(() => 2.ToString()).Returns<IDisposable>(disposable => "string");
+                context.Setup(() => string.IsNullOrEmpty(It.IsAny<string>())).Returns<IDisposable>(disposable => true);
 
-                Assert.Throws<InvalidCastException>(() => 2.ToString());
+                Assert.Throws<InvalidCastException>(() => string.IsNullOrEmpty("test"));
             });
         }
 

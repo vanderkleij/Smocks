@@ -21,6 +21,7 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion License
 
+using System.Linq;
 using System.Reflection;
 using Smocks.Injection;
 using Smocks.Utility;
@@ -142,7 +143,7 @@ namespace Smocks.Setups
 
             if (setup.CallbackAction != null)
             {
-                setup.CallbackAction(arguments);
+                setup.CallbackAction(arguments.Skip(setup.ArgumentsToSkipInCallbacks).ToArray());
             }
 
             HandleOutParameters(arguments, setup, originalMethod);

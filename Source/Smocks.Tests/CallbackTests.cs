@@ -37,6 +37,40 @@ namespace Smocks.Tests
     public partial class CallbackTests
     {
         [TestCase]
+        public void Callback_Constructor_InvokesCallbackWithArguments()
+        {
+            Smock.Run(context =>
+            {
+                string actual = null;
+
+                context
+                    .Setup(() => new Exception(It.IsAny<string>()))
+                    .Callback<string>(arg => actual = arg);
+
+                new Exception("Foo");
+
+                Assert.AreEqual("Foo", actual);
+            });
+        }
+
+        [TestCase]
+        public void Callback_InstanceMethodWithOneArgument_InvokesCallbackWithOneArgument()
+        {
+            Smock.Run(context =>
+            {
+                string argument = null;
+
+                context
+                    .Setup(() => It.IsAny<string>().Contains(It.IsAny<string>()))
+                    .Callback<string>(arg => argument = arg);
+
+                "Foo".Contains("Bar");
+
+                Assert.AreEqual("Bar", argument);
+            });
+        }
+
+        [TestCase]
         public void Callback_NoArgs_InvokesCallbackWithArguments()
         {
             Smock.Run(context =>
@@ -72,9 +106,9 @@ namespace Smocks.Tests
         {
             Smock.Run(context =>
             {
-                context.Setup(() => 2.ToString()).Callback<IDisposable>(disposable => { });
+                context.Setup(() => string.IsNullOrEmpty("Test")).Callback<IDisposable>(disposable => { });
 
-                Assert.Throws<InvalidCastException>(() => 2.ToString());
+                Assert.Throws<InvalidCastException>(() => string.IsNullOrEmpty("Test"));
             });
         }
 
