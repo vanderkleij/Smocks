@@ -93,7 +93,7 @@ namespace Smocks.Serialization
         private bool IsSerializable(Type fieldType)
         {
             bool isDelegate = typeof(Delegate).IsAssignableFrom(fieldType);
-            bool isProxy = typeof (MarshalByRefObject).IsAssignableFrom(fieldType);
+            bool isProxy = typeof(MarshalByRefObject).IsAssignableFrom(fieldType);
             bool result = (fieldType.IsSerializable || isProxy) && !isDelegate;
 
             return result;

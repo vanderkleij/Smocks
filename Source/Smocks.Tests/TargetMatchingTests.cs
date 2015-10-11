@@ -87,5 +87,38 @@ namespace Smocks.Tests
                 Assert.AreNotEqual(expected, otherValueType.GetHashCode());
             });
         }
+
+        [TestCase]
+        public void Setup_ItIsTargetFromMoq_InvokesCallbackAndMatchesWhenItReturnsTrue()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => It.Is<string>(format => format == "A").Length).Returns(42);
+
+                Assert.AreEqual("A".Length, 42);
+            });
+        }
+
+        [TestCase]
+        public void Setup_ItIsTargetFromSmocks_InvokesCallbackAndMatchesWhenItReturnsTrue()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => Matching.It.Is<string>(format => format == "A").Length).Returns(42);
+
+                Assert.AreEqual("A".Length, 42);
+            });
+        }
+
+        [TestCase]
+        public void Setup_ItIsTargetFromMoq_InvokesCallbackAndInvokesOriginalWhenItReturnsFalse()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => It.Is<string>(format => format == "A").Length).Returns(42);
+
+                Assert.AreEqual(1, "B".Length);
+            });
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //// The MIT License (MIT)
 //// 
 //// Copyright (c) 2015 Tom van der Kleij
@@ -22,40 +22,31 @@
 #endregion
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using Smocks.Utility;
 
-namespace Smocks.Matching
+namespace Smocks.Setups
 {
-    /// <summary>
-    /// Provides functionality similar to Moq's It class. Both implementations
-    /// are interchangeable for use in Smocks. Smock provides one for users
-    /// that don't use Moq.
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public static class It
+    internal class ItIsMatcher : IItIsMatcher
     {
-        /// <summary>
-        /// Matches any instance of <see cref="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type to match.</typeparam>
-        /// <returns>The default value of <see cref="T"/>.</returns>
-        public static T IsAny<T>()
+        private readonly IExpressionCompiler _expressionCompiler;
+
+        public ItIsMatcher(IExpressionCompiler expressionCompiler)
         {
-            return default(T);
+            ArgumentChecker.NotNull(expressionCompiler, () => expressionCompiler);
+
+            _expressionCompiler = expressionCompiler;
         }
 
-        /// <summary>
-        /// Matches any instance of <see cref="T" /> that matches the provided predicate.
-        /// </summary>
-        /// <typeparam name="T">The type to match.</typeparam>
-        /// <param name="predicate">The predicate.</param>
-        /// <returns>
-        /// The default value of <see cref="T" />.
-        /// </returns>
-        public static T Is<T>(Expression<Predicate<T>> predicate)
+        public bool ItIsMatch(Expression setupArgument, object actualValue)
         {
-            return default(T);
+            MethodCallExpression expression = (MethodCallExpression)setupArgument;
+            UnaryExpression unaryExpression = (UnaryExpression)expression.Arguments[0];
+
+            Delegate compiledExpression = _expressionCompiler.CompileExpression((LambdaExpression)unaryExpression.Operand);
+            bool returnValue = (bool)compiledExpression.DynamicInvoke(actualValue);
+
+            return returnValue;
         }
     }
 }

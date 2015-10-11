@@ -59,9 +59,19 @@ namespace Smocks.Setups
             return setups.Reverse().FirstOrDefault(setup => ArgumentsMatch(method, setup.MethodCall.Arguments, arguments));
         }
 
+        private static IEnumerable<Expression> ExpandArrayExpression(Expression expression)
+        {
+            return ((NewArrayExpression)expression).Expressions;
+        }
+
+        private static IEnumerable<object> ExpandObjectArray(object array)
+        {
+            return ((IEnumerable)array).Cast<object>();
+        }
+
         private static IEnumerable<T> FilterArguments<T>(
-            MethodBase method, 
-            IEnumerable<T> items, 
+            MethodBase method,
+            IEnumerable<T> items,
             Func<T, IEnumerable<T>> arrayExpander)
         {
             var parameters = method.GetParameters();
@@ -124,16 +134,6 @@ namespace Smocks.Setups
             bool argumentsMatch = actualArguments.Length == itemsToSkip || _argumentMatcher.IsMatch(filteredExpressions, filteredObjects);
 
             return argumentsMatch;
-        }
-
-        private static IEnumerable<object> ExpandObjectArray(object array)
-        {
-            return ((IEnumerable)array).Cast<object>();
-        }
-
-        private static IEnumerable<Expression> ExpandArrayExpression(Expression expression)
-        {
-            return ((NewArrayExpression)expression).Expressions;
         }
     }
 }

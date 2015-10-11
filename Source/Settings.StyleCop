@@ -79,6 +79,12 @@
       <AnalyzerSettings />
     </Analyzer>
     <Analyzer AnalyzerId="StyleCop.CSharp.NamingRules">
+	  <AnalyzerSettings>
+        <CollectionProperty Name="Hungarian">
+          <Value>it</Value>
+		  <Value>op</Value>
+        </CollectionProperty>
+      </AnalyzerSettings>
       <Rules>
 	  <Rule Name="NonPrivateReadonlyFieldsMustBeginWithUpperCaseLetter">
           <RuleSettings>

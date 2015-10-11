@@ -36,12 +36,20 @@ namespace Smocks.Tests.Setups
     public class TargetMatcherTests
     {
         private Mock<IExpressionHelper> _expressionHelperMock;
+        private Mock<IItIsMatcher> _itIsMatcherMock;
 
         [TestCase]
         public void Constructor_ExpressionHelperNull_ThrowsArgumentNullException()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new TargetMatcher(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new TargetMatcher(null, _itIsMatcherMock.Object));
             Assert.AreEqual("expressionHelper", exception.ParamName);
+        }
+
+        [TestCase]
+        public void Constructor_ItIsMatcherNull_ThrowsArgumentNullException()
+        {
+            var exception = Assert.Throws<ArgumentNullException>(() => new TargetMatcher(_expressionHelperMock.Object, null));
+            Assert.AreEqual("itIsMatcher", exception.ParamName);
         }
 
         [TestCase]
@@ -50,10 +58,10 @@ namespace Smocks.Tests.Setups
             var expression = Expression.Constant(1);
 
             _expressionHelperMock
-                .Setup(helper => helper.IsUnconditionalAny(expression))
+                .Setup(helper => helper.IsMethodInvocation(expression, "It", "IsAny", 0))
                 .Returns(true);
 
-            var subject = new TargetMatcher(_expressionHelperMock.Object);
+            var subject = new TargetMatcher(_expressionHelperMock.Object, _itIsMatcherMock.Object);
             var result = subject.IsMatch(typeof(object), expression, 42);
 
             Assert.IsTrue(result);
@@ -66,7 +74,7 @@ namespace Smocks.Tests.Setups
 
             SetupExpressionValue(expression, "aaa");
 
-            var subject = new TargetMatcher(_expressionHelperMock.Object);
+            var subject = new TargetMatcher(_expressionHelperMock.Object, _itIsMatcherMock.Object);
             var result = subject.IsMatch(typeof(string), expression, new string('a', 3));
 
             Assert.IsFalse(result);
@@ -81,7 +89,7 @@ namespace Smocks.Tests.Setups
 
             SetupExpressionValue(expression, value);
 
-            var subject = new TargetMatcher(_expressionHelperMock.Object);
+            var subject = new TargetMatcher(_expressionHelperMock.Object, _itIsMatcherMock.Object);
             var result = subject.IsMatch(typeof(string), expression, value);
 
             Assert.IsTrue(result);
@@ -94,7 +102,7 @@ namespace Smocks.Tests.Setups
 
             SetupExpressionValue(expression, 42);
 
-            var subject = new TargetMatcher(_expressionHelperMock.Object);
+            var subject = new TargetMatcher(_expressionHelperMock.Object, _itIsMatcherMock.Object);
             var result = subject.IsMatch(typeof(int), expression, 42);
 
             Assert.IsTrue(result);
@@ -107,7 +115,7 @@ namespace Smocks.Tests.Setups
 
             SetupExpressionValue(expression, 1000);
 
-            var subject = new TargetMatcher(_expressionHelperMock.Object);
+            var subject = new TargetMatcher(_expressionHelperMock.Object, _itIsMatcherMock.Object);
             var result = subject.IsMatch(typeof(int), expression, 42);
 
             Assert.IsFalse(result);
@@ -117,6 +125,7 @@ namespace Smocks.Tests.Setups
         public void Setup()
         {
             _expressionHelperMock = new Mock<IExpressionHelper>();
+            _itIsMatcherMock = new Mock<IItIsMatcher>();
         }
 
         private void SetupExpressionValue<T>(ConstantExpression expression, T value)

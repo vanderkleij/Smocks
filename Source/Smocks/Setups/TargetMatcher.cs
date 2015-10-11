@@ -30,19 +30,28 @@ namespace Smocks.Setups
     internal class TargetMatcher : ITargetMatcher
     {
         private readonly IExpressionHelper _expressionHelper;
+        private readonly IItIsMatcher _itIsMatcher;
 
-        internal TargetMatcher(IExpressionHelper expressionHelper)
+        internal TargetMatcher(IExpressionHelper expressionHelper, IItIsMatcher itIsMatcher)
         {
             ArgumentChecker.NotNull(expressionHelper, () => expressionHelper);
+            ArgumentChecker.NotNull(itIsMatcher, () => itIsMatcher);
 
             _expressionHelper = expressionHelper;
+            _itIsMatcher = itIsMatcher;
         }
 
         public bool IsMatch(Type targetType, Expression setupArgument, object actualValue)
         {
-            if (_expressionHelper.IsUnconditionalAny(setupArgument))
+            if (_expressionHelper.IsMethodInvocation(setupArgument, "It", "IsAny", 0))
             {
                 return true;
+            }
+
+            bool isItIs = _expressionHelper.IsMethodInvocation(setupArgument, "It", "Is", 1);
+            if (isItIs)
+            {
+                return _itIsMatcher.ItIsMatch(setupArgument, actualValue);
             }
 
             object setupValue = _expressionHelper.GetValue(setupArgument);

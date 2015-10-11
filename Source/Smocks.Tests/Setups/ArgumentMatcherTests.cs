@@ -40,18 +40,26 @@ namespace Smocks.Tests.Setups
             ReflectionUtility.GetExpression(() => It.IsAny<string>());
 
         private Mock<IExpressionHelper> _expressionHelperMock;
+        private Mock<IItIsMatcher> _itIsMatcherMock;
 
         [TestCase]
         public void Constructor_ExpressionHelperNull_ThrowsArgumentNullException()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new ArgumentMatcher(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new ArgumentMatcher(null, _itIsMatcherMock.Object));
             Assert.AreEqual("expressionHelper", exception.ParamName);
+        }
+
+        [TestCase]
+        public void Constructor_ItIsMatcherNull_ThrowsArgumentNullException()
+        {
+            var exception = Assert.Throws<ArgumentNullException>(() => new ArgumentMatcher(_expressionHelperMock.Object, null));
+            Assert.AreEqual("itIsMatcher", exception.ParamName);
         }
 
         [TestCase]
         public void IsMatch_AllSetupArgumentsAny_ReturnsTrue()
         {
-            var subject = new ArgumentMatcher(_expressionHelperMock.Object);
+            var subject = new ArgumentMatcher(_expressionHelperMock.Object, _itIsMatcherMock.Object);
 
             var setupArguments = new[] { AnyStringExpression, AnyStringExpression };
             var actualArguments = new[] { "Hello", "World" };
@@ -64,7 +72,7 @@ namespace Smocks.Tests.Setups
         [TestCase]
         public void IsMatch_AllSetupArgumentsEqual_ReturnsTrue()
         {
-            var subject = new ArgumentMatcher(_expressionHelperMock.Object);
+            var subject = new ArgumentMatcher(_expressionHelperMock.Object, _itIsMatcherMock.Object);
 
             var setupArguments = new[] { Expression.Constant("Hello"), Expression.Constant("World") };
             var actualArguments = new[] { "Hello", "World" };
@@ -77,7 +85,7 @@ namespace Smocks.Tests.Setups
         [TestCase]
         public void IsMatch_SomeSetupArgumentUnequal_ReturnsFalse()
         {
-            var subject = new ArgumentMatcher(_expressionHelperMock.Object);
+            var subject = new ArgumentMatcher(_expressionHelperMock.Object, _itIsMatcherMock.Object);
 
             var setupArguments = new[] { Expression.Constant("Hello"), Expression.Constant("Qwerty") };
             var actualArguments = new[] { "Hello", "World" };
@@ -91,9 +99,11 @@ namespace Smocks.Tests.Setups
         public void Setup()
         {
             _expressionHelperMock = new Mock<IExpressionHelper>();
+            _itIsMatcherMock = new Mock<IItIsMatcher>();
+
             _expressionHelperMock
-                .Setup(helper => helper.IsUnconditionalAny(It.IsAny<Expression>()))
-                .Returns<Expression>(expression => expression == AnyStringExpression);
+                .Setup(helper => helper.IsMethodInvocation(AnyStringExpression, "It", "IsAny", 0))
+                .Returns(true);
 
             _expressionHelperMock
                 .Setup(helper => helper.GetValue(It.IsAny<ConstantExpression>()))

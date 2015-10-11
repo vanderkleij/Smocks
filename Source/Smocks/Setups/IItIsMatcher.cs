@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //// The MIT License (MIT)
 //// 
 //// Copyright (c) 2015 Tom van der Kleij
@@ -21,41 +21,12 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
-namespace Smocks.Matching
+namespace Smocks.Setups
 {
-    /// <summary>
-    /// Provides functionality similar to Moq's It class. Both implementations
-    /// are interchangeable for use in Smocks. Smock provides one for users
-    /// that don't use Moq.
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public static class It
+    internal interface IItIsMatcher
     {
-        /// <summary>
-        /// Matches any instance of <see cref="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type to match.</typeparam>
-        /// <returns>The default value of <see cref="T"/>.</returns>
-        public static T IsAny<T>()
-        {
-            return default(T);
-        }
-
-        /// <summary>
-        /// Matches any instance of <see cref="T" /> that matches the provided predicate.
-        /// </summary>
-        /// <typeparam name="T">The type to match.</typeparam>
-        /// <param name="predicate">The predicate.</param>
-        /// <returns>
-        /// The default value of <see cref="T" />.
-        /// </returns>
-        public static T Is<T>(Expression<Predicate<T>> predicate)
-        {
-            return default(T);
-        }
+        bool ItIsMatch(Expression setupArgument, object actualValue);
     }
 }

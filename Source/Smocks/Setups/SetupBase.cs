@@ -21,9 +21,9 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion License
 
-using Smocks.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Smocks.Utility;
 
 namespace Smocks.Setups
 {
@@ -36,16 +36,16 @@ namespace Smocks.Setups
             MethodCall = methodCall;
         }
 
-        public Lazy<Exception> Exception { get; private set; }
-
-        public MethodCallInfo MethodCall { get; private set; }
-
-        public Action<object[]> CallbackAction { get; set; }
-
         public int ArgumentsToSkipInCallbacks
         {
             get { return (MethodCall.Method.IsStatic || MethodCall.Method.IsConstructor) ? 0 : 1; }
         }
+
+        public Action<object[]> CallbackAction { get; set; }
+
+        public Lazy<Exception> Exception { get; private set; }
+
+        public MethodCallInfo MethodCall { get; private set; }
 
         public bool Verify { get; private set; }
 

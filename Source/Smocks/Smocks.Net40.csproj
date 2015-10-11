@@ -162,6 +162,7 @@
     <Compile Include="Setups\IInternalSetup.Generic.cs" />
     <Compile Include="Setups\IInternalSetupBase.cs" />
     <Compile Include="Setups\IInvocationTracker.cs" />
+    <Compile Include="Setups\IItIsMatcher.cs" />
     <Compile Include="Setups\InterceptorResult.cs" />
     <Compile Include="Setups\InterceptorResult.Generic.cs" />
     <Compile Include="Setups\InvocationTracker.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Setups\ISetupTargetMatcher.cs" />
     <Compile Include="Setups\ITargetMatcher.cs" />
     <Compile Include="Setups\Interceptor.cs" />
+    <Compile Include="Setups\ItIsMatcher.cs" />
     <Compile Include="Setups\Setup.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -227,7 +229,9 @@
     <Compile Include="Utility\ArgumentChecker.cs" />
     <Compile Include="Injection\DefaultServiceLocatorSetup.cs" />
     <Compile Include="Utility\Discoverer.cs" />
+    <Compile Include="Utility\ExpressionCompiler.cs" />
     <Compile Include="Utility\ExpressionHelper.cs" />
+    <Compile Include="Utility\IExpressionCompiler.cs" />
     <Compile Include="Utility\IExpressionHelper.cs" />
     <Compile Include="Injection\IServiceLocatorContainer.cs" />
     <Compile Include="Injection\IServiceLocatorSetup.cs" />

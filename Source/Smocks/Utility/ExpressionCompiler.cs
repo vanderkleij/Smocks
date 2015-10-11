@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //// The MIT License (MIT)
 //// 
 //// Copyright (c) 2015 Tom van der Kleij
@@ -22,40 +22,30 @@
 #endregion
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
-namespace Smocks.Matching
+namespace Smocks.Utility
 {
     /// <summary>
-    /// Provides functionality similar to Moq's It class. Both implementations
-    /// are interchangeable for use in Smocks. Smock provides one for users
-    /// that don't use Moq.
+    /// A compiler for <see cref="Expression"/>s.
     /// </summary>
-    [ExcludeFromCodeCoverage]
-    public static class It
+    public class ExpressionCompiler : IExpressionCompiler
     {
         /// <summary>
-        /// Matches any instance of <see cref="T"/>.
+        /// Compiles an <see cref="LambdaExpression"/> to a <see cref="Delegate"/>.
         /// </summary>
-        /// <typeparam name="T">The type to match.</typeparam>
-        /// <returns>The default value of <see cref="T"/>.</returns>
-        public static T IsAny<T>()
+        /// <param name="expression">The expression.</param>
+        /// <returns>The compiled expression as a <see cref="Delegate"/>.</returns>
+        public Delegate CompileExpression(LambdaExpression expression)
         {
-            return default(T);
-        }
+            ArgumentChecker.NotNull(expression, () => expression);
 
-        /// <summary>
-        /// Matches any instance of <see cref="T" /> that matches the provided predicate.
-        /// </summary>
-        /// <typeparam name="T">The type to match.</typeparam>
-        /// <param name="predicate">The predicate.</param>
-        /// <returns>
-        /// The default value of <see cref="T" />.
-        /// </returns>
-        public static T Is<T>(Expression<Predicate<T>> predicate)
-        {
-            return default(T);
+            var type = expression.GetType();
+            bool isCompilableExpression = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Expression<>);
+            ArgumentChecker.Assert<ArgumentException>(isCompilableExpression, "Unexpected expression type, cannot compile", "expression");
+
+            Delegate compiledDelegate = (Delegate)type.GetMethod("Compile", new Type[0]).Invoke(expression, new object[0]);
+            return compiledDelegate;
         }
     }
 }

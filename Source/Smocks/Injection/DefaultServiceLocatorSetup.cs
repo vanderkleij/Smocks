@@ -52,9 +52,11 @@ namespace Smocks.Injection
             container.RegisterSingleton<ISetupMatcher, SetupMatcher>();
             container.RegisterSingleton<ITargetMatcher, TargetMatcher>();
             container.RegisterSingleton<IArgumentMatcher, ArgumentMatcher>();
+            container.RegisterSingleton<IItIsMatcher, ItIsMatcher>();
 
             container.RegisterSingleton<IMethodDisassembler, MethodDisassembler>();
             container.RegisterSingleton<IExpressionDecompiler, ExpressionDecompiler>();
+            container.RegisterSingleton<IExpressionCompiler, ExpressionCompiler>();
             container.RegisterSingleton<IExpressionHelper, ExpressionHelper>();
             container.RegisterSingleton<IInstructionsCompiler, DynamicMethodCompiler>();
             container.RegisterSingleton<IOpCodeMapper, OpCodeMapper>();

@@ -112,5 +112,64 @@ namespace Smocks.Tests
                 Assert.AreEqual("It works!", result);
             });
         }
+
+        [TestCase]
+        public void Setup_ItIsArgumentFromMoq_InvokesCallbackAndMatchesWhenItReturnsTrue()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => string.Format(It.Is<string>(format => format == "A"))).Returns("Foo");
+
+                Assert.AreEqual("Foo", string.Format("A"));
+            });
+        }
+
+        [TestCase]
+        public void Setup_ItIsArgumentFromMoqWithMultipleConditions_InvokesCallbackAndMatchesWhenItReturnsTrue()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => string.Format(
+                    It.Is<string>(format => format == "A" && format.Contains("A") && format.Length == 1))).Returns("Foo");
+
+                Assert.AreEqual("Foo", string.Format("A"));
+            });
+        }
+
+        [TestCase]
+        public void Setup_MultipleItIsSetups_MatchesTheCorrectSetup()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => string.Format(It.Is<string>(format => format.Contains("A")))).Returns("Foo");
+                context.Setup(() => string.Format(It.Is<string>(format => format.Contains("B")))).Returns("Bar");
+
+                Assert.AreEqual("Foo", string.Format("AA"));
+                Assert.AreEqual("Bar", string.Format("BB"));
+                Assert.AreEqual("CC", string.Format("CC"));
+            });
+        }
+
+        [TestCase]
+        public void Setup_ItIsArgumentFromSmocks_InvokesCallbackAndMatchesWhenItReturnsTrue()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => string.Format(Matching.It.Is<string>(format => format == "A"))).Returns("Foo");
+
+                Assert.AreEqual("Foo", string.Format("A"));
+            });
+        }
+
+        [TestCase]
+        public void Setup_ItIsArgumentFromMoq_InvokesCallbackAndInvokesOriginalWhenItReturnsFalse()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => string.Format(It.Is<string>(format => format == "A"))).Returns("Foo");
+
+                Assert.AreEqual("B", string.Format("B"));
+            });
+        }
     }
 }
