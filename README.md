@@ -67,9 +67,8 @@ PM> Install-Package Smocks
 - ~~Strategies for deciding which assemblies to rewrite~~
 - ~~`.Returns((arg1, arg2) => ...)`~~
 - ~~`.Callback((arg1, arg2) => ...)`~~
+- ~~Matching `It.Is<T>(x => ...)`
 - Strong-named assemblies
-- Configurable strict/loose mocking
-- Matching `It.Is<T>(x => ...)`
 - `.SetupSet(() => ...)`
 - Support for mocking events
 
