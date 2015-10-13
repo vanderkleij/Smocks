@@ -28,79 +28,79 @@ using System.Reflection;
 
 namespace Smocks.Serialization
 {
-	[Serializable]
-	internal class Serializer : ISerializer
-	{
-		private const string StringValueKey = "Value";
+    [Serializable]
+    internal class Serializer : ISerializer
+    {
+        private const string StringValueKey = "Value";
 
-		public object Deserialize(Type targetType, Dictionary<string, object> serializedTarget)
-		{
-			if (targetType == null)
-			{
-				return null;
-			}
+        public object Deserialize(Type targetType, Dictionary<string, object> serializedTarget)
+        {
+            if (targetType == null)
+            {
+                return null;
+            }
 
-			if (targetType == typeof(string))
-			{
-				return (string)serializedTarget[StringValueKey];
-			}
+            if (targetType == typeof(string))
+            {
+                return (string)serializedTarget[StringValueKey];
+            }
 
-			object result = Activator.CreateInstance(targetType);
-			Populate(serializedTarget, result);
+            object result = Activator.CreateInstance(targetType);
+            Populate(serializedTarget, result);
 
-			return result;
-		}
+            return result;
+        }
 
-		public void Populate(Dictionary<string, object> targetValues, object target)
-		{
-			if (target == null)
-			{
-				return;
-			}
+        public void Populate(Dictionary<string, object> targetValues, object target)
+        {
+            if (target == null)
+            {
+                return;
+            }
 
-			foreach (var field in GetSerializableFields(target.GetType()))
-			{
-				object value;
+            foreach (var field in GetSerializableFields(target.GetType()))
+            {
+                object value;
 
-				if (targetValues.TryGetValue(field.Name, out value))
-				{
-					field.SetValue(target, value);
-				}
-			}
-		}
+                if (targetValues.TryGetValue(field.Name, out value))
+                {
+                    field.SetValue(target, value);
+                }
+            }
+        }
 
-		public Dictionary<string, object> Serialize(object target)
-		{
-			if (target == null)
-			{
-				return null;
-			}
+        public Dictionary<string, object> Serialize(object target)
+        {
+            if (target == null)
+            {
+                return null;
+            }
 
-			var targetType = target.GetType();
+            var targetType = target.GetType();
 
-			if (targetType == typeof(string))
-			{
-				return new Dictionary<string, object> { { StringValueKey, (string)target } };
-			}
+            if (targetType == typeof(string))
+            {
+                return new Dictionary<string, object> { { StringValueKey, (string)target } };
+            }
 
-			return GetSerializableFields(target.GetType())
-				.ToDictionary(field => field.Name, field => field.GetValue(target));
-		}
+            return GetSerializableFields(target.GetType())
+                .ToDictionary(field => field.Name, field => field.GetValue(target));
+        }
 
-		private static bool IsSerializable(Type fieldType)
-		{
-			bool isDelegate = typeof(Delegate).IsAssignableFrom(fieldType);
-			bool isProxy = typeof(MarshalByRefObject).IsAssignableFrom(fieldType);
-			bool result = (fieldType.IsSerializable || isProxy) && !isDelegate;
+        private static bool IsSerializable(Type fieldType)
+        {
+            bool isDelegate = typeof(Delegate).IsAssignableFrom(fieldType);
+            bool isProxy = typeof(MarshalByRefObject).IsAssignableFrom(fieldType);
+            bool result = (fieldType.IsSerializable || isProxy) && !isDelegate;
 
-			return result;
-		}
+            return result;
+        }
 
-		private static IEnumerable<FieldInfo> GetSerializableFields(Type fieldType)
-		{
-			return fieldType
-				.GetFields (BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-				.Where (field => IsSerializable(field.FieldType));
-		}
-	}
+        private static IEnumerable<FieldInfo> GetSerializableFields(Type fieldType)
+        {
+            return fieldType
+                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(field => IsSerializable(field.FieldType));
+        }
+    }
 }

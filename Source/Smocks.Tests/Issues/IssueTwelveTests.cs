@@ -34,10 +34,10 @@ namespace Smocks.Tests.Issues
         {
             var now = DateTime.Now.AddMonths(18);
 
-            Smock.Run (ctx => 
+            Smock.Run(ctx => 
             {
                 var person = new Person { FirstName = "John", LastName = "Doe", Age = 24 };
-                ctx.Setup (() => DateTime.Now).Returns(now);
+                ctx.Setup(() => DateTime.Now).Returns(now);
 
                 var name = person.FirstName;
 
@@ -48,8 +48,11 @@ namespace Smocks.Tests.Issues
         public class Person
         {
             public DateTime AccessedOn { get; set; }
+
             public string FirstName { get; set; }
+
             public string LastName { get; set; }
+
             public int Age { get; set; }
         }
     }

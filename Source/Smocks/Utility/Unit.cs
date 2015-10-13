@@ -21,7 +21,6 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 using System;
 
-
 #endregion
 
 namespace Smocks.Utility
@@ -30,7 +29,7 @@ namespace Smocks.Utility
     /// Used in place of Void, as System.Void cannot be used as a generic type parameter.
     /// </summary>
     [Serializable]
-	public abstract class Unit
+    public abstract class Unit
     {
         /// <summary>
         /// The value.
