@@ -67,14 +67,15 @@ namespace Smocks.Tests.IL
 
             var created1 = new MemoryStream();
             var created2 = CultureInfo.CurrentCulture;
+            var container = _containerMock.Object;
 
             _serviceCreatorMock
-                .Setup(creator => creator.Create(types[0], _containerMock.Object))
-                .Returns(created1);
+                .Setup(creator => creator.Create(types[0], container))
+                .Returns(() => created1);
 
             _serviceCreatorMock
-                .Setup(creator => creator.Create(types[1], _containerMock.Object))
-                .Returns(created2);
+                .Setup(creator => creator.Create(types[1], container))
+                .Returns(() => created2);
 
             var result = subject.GetArguments(types, null).ToList();
 
@@ -121,7 +122,7 @@ namespace Smocks.Tests.IL
             _serviceCreatorMock = new Mock<IServiceCreator>(MockBehavior.Strict);
 
             _serviceLocatorMock = new Mock<IServiceLocator>(MockBehavior.Strict);
-            _serviceLocatorMock.SetupGet(locator => locator.Container).Returns(_containerMock.Object);
+            _serviceLocatorMock.SetupGet(locator => locator.Container).Returns(() => _containerMock.Object);
         }
     }
 }

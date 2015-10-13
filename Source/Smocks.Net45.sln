@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smocks.Net45", "Smocks\Smocks.Net45.csproj", "{B62B3313-CE1E-40BA-8E58-23FC6CE89ACF}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Smocks.Tests.Net45", "Smocks.Tests\Smocks.Tests.Net45.csproj", "{7E8E2112-B2F7-49A6-A628-5BECEC0C919F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smocks.Tests.Net45", "Smocks.Tests\Smocks.Tests.Net45.csproj", "{7E8E2112-B2F7-49A6-A628-5BECEC0C919F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smocks.Dummy.Net45", "Smocks.Dummy\Smocks.Dummy.Net45.csproj", "{89B26A82-4B5B-4A16-A8BB-277AD4F0DBF9}"
 EndProject

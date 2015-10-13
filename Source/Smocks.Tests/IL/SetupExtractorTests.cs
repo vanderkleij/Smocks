@@ -202,7 +202,7 @@ namespace Smocks.Tests.IL
                 foreach (var method in methods)
                 {
                     // Skip tests that are expected to throw.
-                    if (!method.Name.Contains("Throws"))
+                    if (!method.Name.Contains("Throws") && !method.DeclaringType.Name.Contains("Throws"))
                     {
                         List<SetupTarget> methodSetups = subject.GetSetups(method).ToList();
                         setups.AddRange(methodSetups);

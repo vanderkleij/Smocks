@@ -19,6 +19,9 @@
 //// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+using System;
+
+
 #endregion
 
 namespace Smocks.Utility
@@ -26,7 +29,8 @@ namespace Smocks.Utility
     /// <summary>
     /// Used in place of Void, as System.Void cannot be used as a generic type parameter.
     /// </summary>
-    public abstract class Unit
+    [Serializable]
+	public abstract class Unit
     {
         /// <summary>
         /// The value.

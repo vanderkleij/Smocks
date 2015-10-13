@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 //// The MIT License (MIT)
 //// 
 //// Copyright (c) 2015 Tom van der Kleij
@@ -22,30 +22,35 @@
 #endregion
 
 using System;
-using System.Reflection;
-using Mono.Cecil;
-using Smocks.Utility;
+using NUnit.Framework;
 
-namespace Smocks.IL.Resolvers
+namespace Smocks.Tests.Issues
 {
-    internal class FieldResolver : IFieldResolver
+    [TestFixture]
+    public class IssueTwelveTests
     {
-        private readonly ITypeResolver _typeResolver;
-
-        public FieldResolver(ITypeResolver typeResolver)
+        [TestCase]
+        public void Issue12()
         {
-            ArgumentChecker.NotNull(typeResolver, () => typeResolver);
+            var now = DateTime.Now.AddMonths(18);
 
-            _typeResolver = typeResolver;
+            Smock.Run (ctx => 
+            {
+                var person = new Person { FirstName = "John", LastName = "Doe", Age = 24 };
+                ctx.Setup (() => DateTime.Now).Returns(now);
+
+                var name = person.FirstName;
+
+                Assert.AreNotEqual(now, person.AccessedOn);
+            });
         }
 
-        public FieldInfo Resolve(FieldReference fieldReference)
+        public class Person
         {
-            Type declaringType = _typeResolver.Resolve(fieldReference.DeclaringType);
-            var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
-            FieldInfo result = declaringType.GetField(fieldReference.Name, flags);
-
-            return result;
+            public DateTime AccessedOn { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public int Age { get; set; }
         }
     }
 }

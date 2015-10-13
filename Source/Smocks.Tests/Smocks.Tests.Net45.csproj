@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -44,16 +44,8 @@
     <AssemblyOriginatorKeyFile>..\Smocks.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Cecil.Mdb">
       <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Pdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Pdb.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Rocks">
       <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Rocks.dll</HintPath>
@@ -65,6 +57,12 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -150,14 +148,15 @@
     <Compile Include="Utility\ImmutableListTests.cs" />
     <Compile Include="Utility\MethodCallInfoTests.cs" />
     <Compile Include="VerifiableTests.cs" />
+    <Compile Include="Issues\IssueTwelveTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Smocks.Dummy\Smocks.Dummy.Net45.csproj">
-      <Project>{89b26a82-4b5b-4a16-a8bb-277ad4f0dbf9}</Project>
+      <Project>{89B26A82-4B5B-4A16-A8BB-277AD4F0DBF9}</Project>
       <Name>Smocks.Dummy.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\Smocks\Smocks.Net45.csproj">
-      <Project>{b62b3313-ce1e-40ba-8e58-23fc6ce89acf}</Project>
+      <Project>{B62B3313-CE1E-40BA-8E58-23FC6CE89ACF}</Project>
       <Name>Smocks.Net45</Name>
     </ProjectReference>
   </ItemGroup>
