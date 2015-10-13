@@ -69,8 +69,7 @@ namespace Smocks.Tests.Setups
             var methodCall = TestDataFactory.CreateMethodCallInfo(() => Console.ReadLine());
             var subject = new Setup<string>(methodCall);
 
-            string returnValue;
-            Assert.Throws<InvalidOperationException>(() => returnValue = subject.GetReturnValue(null));
+            Assert.Throws<InvalidOperationException>(() => subject.GetReturnValue(null));
         }
     }
 }

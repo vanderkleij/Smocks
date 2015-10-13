@@ -36,8 +36,6 @@ namespace Smocks.Tests.Utility
     [TestFixture]
     public class MethodCallInfoTests
     {
-        private Mock<IExpressionHelper> _expressionHelperMock;
-
         [TestCase]
         public void Equals_OtherDifferentMethod_ReturnsFalse()
         {
@@ -136,7 +134,6 @@ namespace Smocks.Tests.Utility
         [SetUp]
         public void Setup()
         {
-            _expressionHelperMock = new Mock<IExpressionHelper>();
         }
 
         private MethodCallInfo CreateSubject(Expression<Action> expression)

@@ -34,12 +34,6 @@ namespace Smocks.Tests.IL.Dependencies
     [TestFixture]
     public class DependencyGraphNodeTests
     {
-        private static readonly ModuleDefinition Module1 =
-            CecilUtility.Import(typeof(object)).Resolve().Module;
-
-        private static readonly ModuleDefinition Module2 =
-            CecilUtility.Import(typeof(DependencyGraphNodeTests)).Resolve().Module;
-
         [TestCase]
         public void Constructor_ModuleComparerNull_ThrowsArgumentNullException()
         {
