@@ -123,7 +123,9 @@ namespace Smocks.IL
             };
 
             foreach (var module in assembly.Modules)
-              module.Mvid = Guid.NewGuid();
+            {
+                module.Mvid = Guid.NewGuid();                
+            }
 
             assembly.Write(outputPath, writerParameters);
 
