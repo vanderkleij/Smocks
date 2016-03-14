@@ -122,6 +122,9 @@ namespace Smocks.IL
                 WriteSymbols = hasSymbols
             };
 
+            foreach (var module in assembly.Modules)
+              module.Mvid = Guid.NewGuid();
+
             assembly.Write(outputPath, writerParameters);
 
             _rewrittenAssemblies.Add(outputPath);
