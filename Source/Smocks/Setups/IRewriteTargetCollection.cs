@@ -21,20 +21,13 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq.Expressions;
-using System.Reflection;
+using Mono.Cecil;
 
 namespace Smocks.Setups
 {
-    internal interface ISetupManager : IEnumerable<IInternalSetup>
+    internal interface IRewriteTargetCollection : IEnumerable<IRewriteTarget>
     {
-        ISetup Create(Expression<Action> expression);
-
-        ISetup<TReturnValue> Create<TReturnValue>(Expression<Func<TReturnValue>> expression);
-
-        ReadOnlyCollection<IInternalSetup> GetSetupsForMethod(MethodBase target);
+        IRewriteTargetMatcher GetMatcher(ModuleDefinition module);
     }
 }

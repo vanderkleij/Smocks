@@ -60,7 +60,7 @@ namespace Smocks.Tests.Setups
 
             var subject = new SetupTarget(expression, method);
 
-            Assert.AreSame(method, subject.Method);
+            Assert.AreSame(method, subject.Methods[0]);
             Assert.AreSame(expression, subject.Expression);
         }
     }

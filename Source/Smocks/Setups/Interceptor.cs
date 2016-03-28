@@ -66,6 +66,7 @@ namespace Smocks.Setups
         /// and what the return value is, if it was.</returns>
         public static InterceptorResult<TReturnValue> Intercept<TReturnValue>(object[] arguments, MethodBase originalMethod)
         {
+            System.Diagnostics.Debugger.Break();
             return ServiceLocator.Instance.Resolve<Interceptor>()
                 .InterceptMethod<TReturnValue>(arguments, originalMethod);
         }
@@ -78,12 +79,14 @@ namespace Smocks.Setups
         /// <returns>A result that specifies whether the method was intercepted.</returns>
         public static InterceptorResult InterceptVoid(object[] arguments, MethodBase originalMethod)
         {
+            System.Diagnostics.Debugger.Break();
             return ServiceLocator.Instance.Resolve<Interceptor>()
                 .InterceptVoidMethod(arguments, originalMethod);
         }
 
         internal InterceptorResult<TReturnValue> InterceptMethod<TReturnValue>(object[] arguments, MethodBase originalMethod)
         {
+            System.Diagnostics.Debugger.Break();
             var setup = _setupMatcher.GetBestMatchingSetup(
                 originalMethod, arguments) as IInternalSetup<TReturnValue>;
 
@@ -105,6 +108,7 @@ namespace Smocks.Setups
 
         internal InterceptorResult InterceptVoidMethod(object[] arguments, MethodBase originalMethod)
         {
+            System.Diagnostics.Debugger.Break();
             IInternalSetup setup = _setupMatcher.GetBestMatchingSetup(originalMethod, arguments);
 
             _invocationTracker.Track(originalMethod, arguments, setup);
@@ -136,6 +140,8 @@ namespace Smocks.Setups
 
         private void HandleSetup(object[] arguments, IInternalSetupBase setup, MethodBase originalMethod)
         {
+            System.Diagnostics.Debugger.Break();
+
             if (setup.Exception != null)
             {
                 throw setup.Exception.Value;

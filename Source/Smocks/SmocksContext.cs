@@ -38,20 +38,24 @@ namespace Smocks
     public class SmocksContext : ISmocksContext, ISerializable
     {
         private readonly IInvocationTracker _invocationTracker;
+        private readonly EventInterceptor _eventInterceptor;
         private readonly ISetupManager _setupManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SmocksContext"/> class.
+        /// Initializes a new instance of the <see cref="SmocksContext" /> class.
         /// </summary>
         /// <param name="setupManager">The setup manager.</param>
         /// <param name="invocationTracker">The invocation tracker.</param>
-        internal SmocksContext(ISetupManager setupManager, IInvocationTracker invocationTracker)
+        /// <param name="eventInterceptor">The event interceptor.</param>
+        internal SmocksContext(ISetupManager setupManager, IInvocationTracker invocationTracker, EventInterceptor eventInterceptor)
         {
-            ArgumentChecker.NotNull(setupManager, () => setupManager);
-            ArgumentChecker.NotNull(invocationTracker, () => invocationTracker);
+            ArgumentChecker.NotNull(setupManager, nameof(setupManager));
+            ArgumentChecker.NotNull(invocationTracker, nameof(invocationTracker));
+            ArgumentChecker.NotNull(eventInterceptor, nameof(eventInterceptor));
 
             _setupManager = setupManager;
             _invocationTracker = invocationTracker;
+            _eventInterceptor = eventInterceptor;
         }
 
         /// <summary>
@@ -62,7 +66,8 @@ namespace Smocks
         /// <param name="context">The context.</param>
         protected SmocksContext(SerializationInfo info, StreamingContext context)
             : this(ServiceLocator.Instance.Resolve<ISetupManager>(),
-                   ServiceLocator.Instance.Resolve<IInvocationTracker>())
+                   ServiceLocator.Instance.Resolve<IInvocationTracker>(),
+                   ServiceLocator.Instance.Resolve<EventInterceptor>())
         {
         }
 
@@ -106,6 +111,34 @@ namespace Smocks
         public void Verify()
         {
             _invocationTracker.Verify();
+        }
+
+        /// <summary>
+        /// Raises the specified event.
+        /// </summary>
+        /// <param name="addExpression">A lambda pointing to the add handler of the event to raise.</param>
+        /// <param name="removeExpression">A lambda pointing to the remove handler of the event to raise.</param>
+        /// <param name="eventArgs">The instance containing the event data.</param>
+        /// <returns>
+        /// The value returned from invoking the event, if any.
+        /// </returns>
+        public object Raise(Action addExpression, Action removeExpression, EventArgs eventArgs)
+        { 
+            return _eventInterceptor.Raise(addExpression, removeExpression, eventArgs);
+        }
+
+        /// <summary>
+        /// Raises the specified event.
+        /// </summary>
+        /// <param name="addExpression">A lambda pointing to the add handler of the event to raise.</param>
+        /// <param name="removeExpression">A lambda pointing to the remove handler of the event to raise.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>
+        /// The value returned from invoking the event, if any.
+        /// </returns>
+        public object Raise(Action addExpression, Action removeExpression, params object[] arguments)
+        {
+            return _eventInterceptor.Raise(addExpression, removeExpression, arguments);
         }
     }
 }

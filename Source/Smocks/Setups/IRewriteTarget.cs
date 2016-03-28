@@ -21,59 +21,21 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
 using System.Reflection;
-using Smocks.Utility;
 
 namespace Smocks.Setups
 {
-    /// <summary>
-    /// Represents that target of a <see cref="ISetup"/>.
-    /// </summary>
-    internal class SetupTarget : IRewriteTarget
+    internal interface IRewriteTarget
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SetupTarget" /> class.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="method">The method.</param>
-        internal SetupTarget(Expression expression, MethodBase method)
-        {
-            ArgumentChecker.NotNull(expression, () => expression);
-            ArgumentChecker.NotNull(method, () => method);
-
-            Expression = expression;
-            Methods = new List<MethodBase> { method }.AsReadOnly();
-        }
-
-        /// <summary>
-        /// Gets the expression that selects the target of the setup.
-        /// </summary>
-        public Expression Expression { get; }
-
         /// <summary>
         /// Gets the methods that should be rewritten.
         /// </summary>
-        public ReadOnlyCollection<MethodBase> Methods { get; }
+        ReadOnlyCollection<MethodBase> Methods { get; }
 
         /// <summary>
         /// Gets a value indicating whether the target is an event accessor method.
         /// </summary>
-        public bool IsEvent => false;
-
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
-        [ExcludeFromCodeCoverage]
-        public override string ToString()
-        {
-            return string.Format("{0}", Expression);
-        }
+        bool IsEvent { get; }
     }
 }

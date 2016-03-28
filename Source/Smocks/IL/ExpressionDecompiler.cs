@@ -25,7 +25,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Smocks.IL.Resolvers;
@@ -40,7 +39,9 @@ namespace Smocks.IL
     /// of the expression, recompiling those instructions to a method
     /// and invoking this new method.
     /// </summary>
-    internal class ExpressionDecompiler : IExpressionDecompiler
+    /// <typeparam name="TExpression">The type of the expression.</typeparam>
+    /// <seealso cref="Smocks.IL.IExpressionDecompiler{TExpression}" />
+    internal class ExpressionDecompiler<TExpression> : IExpressionDecompiler<TExpression>
     {
         private readonly IArgumentGenerator _argumentGenerator;
         private readonly IInstructionHelper _instructionHelper;
@@ -49,7 +50,7 @@ namespace Smocks.IL
         private readonly ITypeResolver _typeResolver;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExpressionDecompiler"/> class.
+        /// Initializes a new instance of the <see cref="ExpressionDecompiler{TExpression}" /> class.
         /// </summary>
         /// <param name="instructionsCompiler">The instructions compiler.</param>
         /// <param name="instructionHelper">The instruction helper.</param>
@@ -85,16 +86,60 @@ namespace Smocks.IL
         /// <param name="body">The body.</param>
         /// <param name="instruction">The instruction.</param>
         /// <param name="target">The target of the method, if any.</param>
-        /// <returns>The compiled expression.</returns>
-        public Expression Decompile(MethodBody body, Instruction instruction, object target)
+        /// <returns>
+        /// The compiled expression.
+        /// </returns>
+        public TExpression Decompile(MethodBody body, Instruction instruction, object target)
         {
+            return Decompile(body, instruction, target, 1, 0);
+        }
+
+        /// <summary>
+        /// Decompiles an expression that's on the stack at the specified
+        /// instruction in the specified method. This is done by reversing from the
+        /// specified instruction until the stack should be empty. The instructions
+        /// can then be replayed from that point.
+        /// </summary>
+        /// <param name="body">The body.</param>
+        /// <param name="instruction">The instruction.</param>
+        /// <param name="target">The target of the method, if any.</param>
+        /// <param name="expectedStackSize">The number of objects expected to be on the stack when we get to the instruction.</param>
+        /// <param name="stackEntriesToSkip">The number of stack entries to skip.</param>
+        /// <returns>
+        /// The compiled expression.
+        /// </returns>
+        public TExpression Decompile(MethodBody body, Instruction instruction, object target, int expectedStackSize, int stackEntriesToSkip)
+        {
+            ArgumentChecker.Assert<ArgumentException>(
+                stackEntriesToSkip < expectedStackSize,
+                "Cannot skip more elements than there are on the stack",
+                nameof(stackEntriesToSkip));
+
             BitArray includedInstructions = new BitArray(body.Instructions.Count);
 
-            if (IncludeInstructionsUntilStackEmpty(body, instruction, includedInstructions))
+            if (IncludeInstructionsUntilStackEmpty(body, instruction, includedInstructions, expectedStackSize))
             {
                 List<Instruction> instructions = body.Instructions
                         .Where((t, i) => includedInstructions[i])
                         .ToList();
+
+                List<VariableDefinition> variables = body.Variables.ToList();
+                VariableDefinition resultVariable = new VariableDefinition(body.Method.Module.Import(typeof(TExpression)));
+                variables.Add(resultVariable);
+
+                for (int i = 0; i < expectedStackSize; ++i)
+                {
+                    if (i == stackEntriesToSkip)
+                    {
+                        instructions.Add(Instruction.Create(OpCodes.Stloc, resultVariable));
+                    }
+                    else
+                    {
+                        instructions.Add(Instruction.Create(OpCodes.Pop));
+                    }
+                }
+
+                instructions.Add(Instruction.Create(OpCodes.Ldloc, resultVariable));
 
                 // Gets the parameters used by the instructions.
                 TypeReference[] parameterTypes = _parameterDeducer.GetParameters(body.Method, instructions);
@@ -103,8 +148,8 @@ namespace Smocks.IL
                 // TODO: pass only the used variables instead of Body.Variables.
                 // Currently, this is bugged so body.Variables is used. The additional
                 // variables are not really an issue.
-                ICompiledMethod<Expression> method = _instructionsCompiler.Compile<Expression>(
-                    parameterTypes, instructions, body.Variables);
+                ICompiledMethod<TExpression> method = _instructionsCompiler.Compile<TExpression>(
+                    parameterTypes, instructions, variables);
 
                 // Try to construct the arguments required by the instructions.
                 object[] arguments = _argumentGenerator.GetArguments(resolvedParameterTypes, target).ToArray();
@@ -112,7 +157,7 @@ namespace Smocks.IL
                 return method.Invoke(arguments);
             }
 
-            return null;
+            return default(TExpression);
         }
 
         private static int GetNumberPoppedByInstruction(Instruction current)
@@ -126,9 +171,8 @@ namespace Smocks.IL
         }
 
         private bool IncludeInstructionsUntilStackEmpty(MethodBody body,
-            Instruction instruction, BitArray includedInstructions)
+            Instruction instruction, BitArray includedInstructions, int expectedStackSize)
         {
-            int expectedStackSize = 1;
             int instructionIndex = body.Instructions.IndexOf(instruction);
 
             // Instruction currently points to the instruction where
@@ -202,7 +246,7 @@ namespace Smocks.IL
             int writeIndex = body.Instructions.IndexOf(writeUsage.Instruction);
 
             includedInstructions[writeIndex] = true;
-            IncludeInstructionsUntilStackEmpty(body, writeUsage.Instruction, includedInstructions);
+            IncludeInstructionsUntilStackEmpty(body, writeUsage.Instruction, includedInstructions, 1);
         }
     }
 }

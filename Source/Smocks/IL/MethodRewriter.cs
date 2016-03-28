@@ -39,11 +39,14 @@ namespace Smocks.IL
         private const string CecilConstructorName = ".ctor";
 
         private static readonly MethodBase GetMethodFromHandleMethod =
-            typeof(MethodBase).GetMethod("GetMethodFromHandle", new[] { typeof(RuntimeMethodHandle) });
+            typeof(MethodBase).GetMethod(nameof(MethodBase.GetMethodFromHandle), new[] { typeof(RuntimeMethodHandle) });
 
-        private static readonly MethodBase HookMethod = typeof(Interceptor).GetMethod("Intercept");
-        private static readonly MethodBase HookVoidMethod = typeof(Interceptor).GetMethod("InterceptVoid");
-        private static readonly PropertyInfo InterceptedProperty = typeof(InterceptorResult).GetProperty("Intercepted");
+        private static readonly MethodBase HookMethod = typeof(Interceptor).GetMethod(nameof(Interceptor.Intercept));
+
+        private static readonly MethodBase HookVoidEventMethod = typeof(EventInterceptor).GetMethod(nameof(EventInterceptor.InterceptVoidEvent));
+        private static readonly MethodBase HookVoidMethod = typeof(Interceptor).GetMethod(nameof(Interceptor.InterceptVoid));
+        private static readonly PropertyInfo InterceptedProperty = typeof(InterceptorResult).GetProperty(nameof(InterceptorResult.Intercepted));
+
         private readonly IInstructionHelper _instructionHelper;
 
         internal MethodRewriter(IInstructionHelper instructionHelper)
@@ -54,7 +57,7 @@ namespace Smocks.IL
         }
 
         public bool Rewrite(Configuration configuration, MethodDefinition method,
-            ISetupTargetMatcher setupTargetMatcher)
+            IRewriteTargetMatcher rewriteTargetMatcher)
         {
             bool rewritten = false;
 
@@ -71,7 +74,7 @@ namespace Smocks.IL
                 MethodReference calledMethod;
                 if (_instructionHelper.TryGetCall(instruction, out calledMethod))
                 {
-                    var targets = setupTargetMatcher.GetMatchingTargets(calledMethod).ToList();
+                    List<IRewriteTarget> targets = rewriteTargetMatcher.GetMatchingTargets(calledMethod).ToList();
 
                     if (targets.Count == 0)
                     {
@@ -89,9 +92,9 @@ namespace Smocks.IL
             return rewritten;
         }
 
-        private static MethodReference GetInterceptorMethod(MethodReference originalMethod, bool isVoidMethod)
+        private static MethodReference GetInterceptorMethod(MethodReference originalMethod, bool isVoidMethod, EventRewriteTarget eventTarget)
         {
-            MethodBase replacementMethod = isVoidMethod ? HookVoidMethod : HookMethod;
+            MethodBase replacementMethod = GetReplacementMethod(isVoidMethod, isEvent: eventTarget != null);
             MethodReference importedReplacement = originalMethod.Module.Import(replacementMethod);
 
             bool isGenericHookMethod = importedReplacement.HasGenericParameters;
@@ -100,9 +103,16 @@ namespace Smocks.IL
             {
                 GenericInstanceMethod boundMethod = new GenericInstanceMethod(importedReplacement);
 
-                TypeReference returnValue = GetReturnValue(originalMethod);
+                if (eventTarget != null)
+                {
+                    boundMethod.GenericArguments.Add(originalMethod.Module.Import(eventTarget.EventHandlerType));
+                }
 
-                boundMethod.GenericArguments.Add(returnValue);
+                if (!isVoidMethod)
+                {
+                    TypeReference returnValue = GetReturnValue(originalMethod);
+                    boundMethod.GenericArguments.Add(returnValue);
+                }
 
                 importedReplacement = boundMethod;
             }
@@ -124,6 +134,18 @@ namespace Smocks.IL
             return parameterTypes;
         }
 
+        private static MethodBase GetReplacementMethod(bool isVoidMethod, bool isEvent)
+        {
+            if (isEvent && !isVoidMethod)
+            {
+                throw new InvalidOperationException("An event accessor should always return void");
+            }
+
+            return isEvent
+                ? HookVoidEventMethod
+                : (isVoidMethod ? HookVoidMethod : HookMethod);
+        }
+
         private static TypeReference GetReturnValue(MethodReference originalMethod)
         {
             TypeReference returnValue = IsConstructor(originalMethod)
@@ -137,6 +159,12 @@ namespace Smocks.IL
         private static bool IsConstructor(MethodReference method)
         {
             return method.Name == CecilConstructorName;
+        }
+
+        private static void PushMethod(RewriteContext context, MethodReference method)
+        {
+            context.Insert(Instruction.Create(OpCodes.Ldtoken, method));
+            context.Insert(Instruction.Create(OpCodes.Call, context.Method.Module.Import(GetMethodFromHandleMethod)));
         }
 
         private static TypeReference ResolveGenericParameters(TypeReference typeReference, MethodReference method)
@@ -229,12 +257,19 @@ namespace Smocks.IL
 
         private VariableDefinition InvokeReplacementMethod(RewriteContext context, VariableDefinition arrayVariable, bool isVoidMethod)
         {
-            var importedReplacement = GetInterceptorMethod(context.Method, isVoidMethod);
+            EventRewriteTarget eventTarget = context.Targets[0] as EventRewriteTarget;
+
+            var importedReplacement = GetInterceptorMethod(context.Method, isVoidMethod, eventTarget);
 
             context.Insert(Instruction.Create(OpCodes.Ldloc, arrayVariable));
 
-            context.Insert(Instruction.Create(OpCodes.Ldtoken, context.Method));
-            context.Insert(Instruction.Create(OpCodes.Call, context.Method.Module.Import(GetMethodFromHandleMethod)));
+            PushMethod(context, context.Method);
+
+            if (eventTarget != null)
+            {
+                PushMethod(context, context.Method.Module.Import(eventTarget.AddMethod));
+                PushMethod(context, context.Method.Module.Import(eventTarget.RemoveMethod));
+            }
 
             context.Insert(Instruction.Create(OpCodes.Call, importedReplacement));
 
@@ -299,7 +334,7 @@ namespace Smocks.IL
             });
 
             context.Processor.Remove(context.OriginalInstruction);
-            
+
             context.Processor.Body.OptimizeMacros();
         }
 

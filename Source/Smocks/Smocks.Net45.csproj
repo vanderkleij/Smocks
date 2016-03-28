@@ -84,6 +84,9 @@
     <Compile Include="Exceptions\VerificationException.cs" />
     <Compile Include="IL\ArgumentGenerator.cs" />
     <Compile Include="IL\Dependencies\IDependencyGraph.cs" />
+    <Compile Include="IL\EventAccessorExtractor.cs" />
+    <Compile Include="IL\EventRewriteTarget.cs" />
+    <Compile Include="IL\EventTargetExtractor.cs" />
     <Compile Include="IL\Filters\AllowAllModuleFilter.cs" />
     <Compile Include="IL\Filters\ModuleFilterFactory.cs" />
     <Compile Include="IL\AssemblyRewriter.cs" />
@@ -102,6 +105,8 @@
     <Compile Include="IL\Filters\IModuleFilterFactory.cs" />
     <Compile Include="IL\IAssemblyRewriter.cs" />
     <Compile Include="IL\ICompiledMethod.cs" />
+    <Compile Include="IL\IEventAccessorExtractor.cs" />
+    <Compile Include="IL\IEventTargetExtractor.cs" />
     <Compile Include="IL\IExpressionDecompiler.cs" />
     <Compile Include="IL\IInstructionHelper.cs" />
     <Compile Include="IL\IMethodImporter.cs" />
@@ -130,6 +135,9 @@
     <Compile Include="Matching\It.cs" />
     <Compile Include="Scope.cs" />
     <Compile Include="Setups\ArgumentMatcher.cs" />
+    <Compile Include="Setups\EventInterceptor.cs" />
+    <Compile Include="Setups\EventAccessorPair.cs" />
+    <Compile Include="Setups\EventSurrogate.cs" />
     <Compile Include="Setups\Fluent\ICallback.cs" />
     <Compile Include="Setups\Fluent\ICallback.Generated.cs">
       <DependentUpon>ICallback.Generated.tt</DependentUpon>
@@ -159,9 +167,10 @@
     <Compile Include="Setups\InterceptorResult.cs" />
     <Compile Include="Setups\InterceptorResult.Generic.cs" />
     <Compile Include="Setups\InvocationTracker.cs" />
+    <Compile Include="Setups\IRewriteTarget.cs" />
     <Compile Include="Setups\ISetupManager.cs" />
     <Compile Include="Setups\ISetupMatcher.cs" />
-    <Compile Include="Setups\ISetupTargetMatcher.cs" />
+    <Compile Include="Setups\IRewriteTargetMatcher.cs" />
     <Compile Include="Setups\ITargetMatcher.cs" />
     <Compile Include="Setups\Interceptor.cs" />
     <Compile Include="Setups\ItIsMatcher.cs" />
@@ -178,7 +187,7 @@
     </Compile>
     <Compile Include="Setups\SetupManager.cs" />
     <Compile Include="Setups\SetupMatcher.cs" />
-    <Compile Include="Setups\SetupTargetCollection.cs" />
+    <Compile Include="Setups\RewriteTargetCollection.cs" />
     <Compile Include="IL\Visitors\IInstructionVisitor.cs" />
     <Compile Include="IL\ILGeneratorInstructionVisitor.cs" />
     <Compile Include="IL\ILGeneratorWrapper.cs" />
@@ -213,11 +222,11 @@
     <Compile Include="Serialization\Serializer.cs" />
     <Compile Include="Setups\ISetup.cs" />
     <Compile Include="Setups\ISetup.Generic.cs" />
-    <Compile Include="Setups\ISetupTargetCollection.cs" />
+    <Compile Include="Setups\IRewriteTargetCollection.cs" />
     <Compile Include="Setups\SetupTarget.cs" />
     <Compile Include="Setups\SetupBase.cs" />
     <Compile Include="Setups\Setup.Generic.cs" />
-    <Compile Include="Setups\SetupTargetMatcher.cs" />
+    <Compile Include="Setups\RewriteTargetMatcher.cs" />
     <Compile Include="Setups\TargetMatcher.cs" />
     <Compile Include="Utility\ArgumentChecker.cs" />
     <Compile Include="Injection\DefaultServiceLocatorSetup.cs" />

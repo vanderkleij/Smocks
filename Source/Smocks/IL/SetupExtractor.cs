@@ -36,14 +36,14 @@ namespace Smocks.IL
 {
     internal class SetupExtractor : ISetupExtractor
     {
-        private readonly IExpressionDecompiler _expressionDecompiler;
+        private readonly IExpressionDecompiler<Expression> _expressionDecompiler;
         private readonly IExpressionHelper _expressionHelper;
         private readonly IMethodDisassembler _methodDisassembler;
         private readonly List<MethodInfo> _setupMethods = GetSetupMethods().ToList();
 
         internal SetupExtractor(
             IMethodDisassembler methodDisassembler,
-            IExpressionDecompiler expressionDecompiler,
+            IExpressionDecompiler<Expression> expressionDecompiler,
             IExpressionHelper expressionHelper)
         {
             ArgumentChecker.NotNull(methodDisassembler, () => methodDisassembler);

@@ -96,6 +96,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CallbackTests.Generated.tt</DependentUpon>
     </Compile>
+    <Compile Include="EventsTests.cs" />
     <Compile Include="FuncTests.cs" />
     <Compile Include="IL\ArgumentGeneratorTests.cs" />
     <Compile Include="IL\CompiledDynamicMethodTests.cs" />
@@ -130,7 +131,7 @@
     <Compile Include="Setups\SetupManagerTests.cs" />
     <Compile Include="Setups\SetupMatcherTests.cs" />
     <Compile Include="Setups\SetupTargetCollectionTests.cs" />
-    <Compile Include="Setups\SetupTargetMatcherTests.cs" />
+    <Compile Include="Setups\RewriteTargetMatcherTests.cs" />
     <Compile Include="Setups\SetupTargetTests.cs" />
     <Compile Include="Setups\SetupTests.cs" />
     <Compile Include="Setups\GenericSetupTests.cs" />

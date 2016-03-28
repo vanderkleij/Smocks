@@ -46,6 +46,7 @@ namespace Smocks.IL.Visitors
                 case Code.Brtrue_S:
                 case Code.Brfalse:
                 case Code.Brfalse_S:
+                case Code.Stsfld:
                 case Code.Pop:
                 case Code.Br:
                 case Code.Ret: // From the current method's perspective
@@ -86,6 +87,8 @@ namespace Smocks.IL.Visitors
                 case Code.Ldloc_S:
                 case Code.Ldloca:
                 case Code.Ldloca_S:
+                case Code.Ldsfld:
+                case Code.Ldsflda:
                 case Code.Box:
                 case Code.Ceq:
                     return 1;
@@ -110,6 +113,9 @@ namespace Smocks.IL.Visitors
                     return operand.ReturnType.FullName == "System.Void" ? 0 : 1;
 
                 case Code.Newobj:
+                    return 1;
+
+                case Code.Ldftn: // "Pushes an unmanaged pointer (type native int) to the native code implementing a specific method onto the evaluation stack."
                     return 1;
 
                 default:

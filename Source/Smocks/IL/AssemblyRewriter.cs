@@ -39,7 +39,7 @@ namespace Smocks.IL
         private readonly IMethodRewriter _methodRewriter;
         private readonly IModuleFilter _moduleFilter;
         private readonly List<string> _rewrittenAssemblies = new List<string>();
-        private readonly ISetupTargetCollection _setupTargetCollection;
+        private readonly IRewriteTargetCollection _rewriteTargetCollection;
 
         internal AssemblyRewriter(IMethodRewriter methodRewriter, IModuleFilter moduleFilter)
             : this(new Configuration(), new List<SetupTarget>(), methodRewriter, moduleFilter)
@@ -48,29 +48,29 @@ namespace Smocks.IL
 
         internal AssemblyRewriter(
             Configuration configuration,
-            ISetupTargetCollection setupTargetCollection,
+            IRewriteTargetCollection rewriteTargetCollection,
             IMethodRewriter methodRewriter,
             IModuleFilter moduleFilter)
         {
             ArgumentChecker.NotNull(configuration, () => configuration);
-            ArgumentChecker.NotNull(setupTargetCollection, () => setupTargetCollection);
+            ArgumentChecker.NotNull(rewriteTargetCollection, () => rewriteTargetCollection);
             ArgumentChecker.NotNull(methodRewriter, () => methodRewriter);
             ArgumentChecker.NotNull(moduleFilter, () => moduleFilter);
 
             _configuration = configuration;
-            _setupTargetCollection = setupTargetCollection;
+            _rewriteTargetCollection = rewriteTargetCollection;
             _methodRewriter = methodRewriter;
             _moduleFilter = moduleFilter;
         }
 
         internal AssemblyRewriter(
                 Configuration configuration,
-                IEnumerable<SetupTarget> targets,
+                IEnumerable<IRewriteTarget> targets,
                 IMethodRewriter methodRewriter,
                 IModuleFilter moduleFilter)
             : this(
                 configuration,
-                new SetupTargetCollection(targets),
+                new RewriteTargetCollection(targets),
                 methodRewriter,
                 moduleFilter)
         {
@@ -99,7 +99,7 @@ namespace Smocks.IL
             {
                 if (_moduleFilter.Accepts(module))
                 {
-                    ISetupTargetMatcher targetCollection = _setupTargetCollection.GetMatcher(module);
+                    IRewriteTargetMatcher targetCollection = _rewriteTargetCollection.GetMatcher(module);
 
                     var types = module.GetTypes().ToList();
                     foreach (var type in types)
@@ -146,7 +146,7 @@ namespace Smocks.IL
         }
 
         private bool ProcessType(Configuration configuration, TypeDefinition type,
-            ISetupTargetMatcher targetMatcher)
+            IRewriteTargetMatcher targetMatcher)
         {
             bool rewritten = false;
 

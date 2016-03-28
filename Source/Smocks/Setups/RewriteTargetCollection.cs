@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //// The MIT License (MIT)
 //// 
 //// Copyright (c) 2015 Tom van der Kleij
@@ -21,20 +21,40 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq.Expressions;
-using System.Reflection;
+using System.Linq;
+using Mono.Cecil;
+using Smocks.IL;
+using Smocks.Utility;
 
 namespace Smocks.Setups
 {
-    internal interface ISetupManager : IEnumerable<IInternalSetup>
+    internal class RewriteTargetCollection : IRewriteTargetCollection
     {
-        ISetup Create(Expression<Action> expression);
+        private readonly ReadOnlyCollection<IRewriteTarget> _targets;
 
-        ISetup<TReturnValue> Create<TReturnValue>(Expression<Func<TReturnValue>> expression);
+        public RewriteTargetCollection(IEnumerable<IRewriteTarget> targets)
+        {
+            ArgumentChecker.NotNull(targets, () => targets);
 
-        ReadOnlyCollection<IInternalSetup> GetSetupsForMethod(MethodBase target);
+            _targets = targets.ToList().AsReadOnly();
+        }
+
+        public IEnumerator<IRewriteTarget> GetEnumerator()
+        {
+            return _targets.GetEnumerator();
+        }
+
+        public IRewriteTargetMatcher GetMatcher(ModuleDefinition module)
+        {
+            return new RewriteTargetMatcher(new ModuleDefinitionMethodImporter(module), _targets);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

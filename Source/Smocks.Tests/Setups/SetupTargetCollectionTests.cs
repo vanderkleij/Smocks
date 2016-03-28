@@ -37,7 +37,7 @@ namespace Smocks.Tests.Setups
         [TestCase]
         public void Constructor_TargetsNull_ThrowsArgumentNullException()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new SetupTargetCollection(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new RewriteTargetCollection(null));
             Assert.AreEqual("targets", exception.ParamName);
         }
 
@@ -50,11 +50,11 @@ namespace Smocks.Tests.Setups
                 TestDataFactory.CreateSetupTarget(() => Console.ReadLine())
             };
 
-            var subject = new SetupTargetCollection(targets);
+            var subject = new RewriteTargetCollection(targets);
             var matcher = subject.GetMatcher(TestDataFactory.CreateModuleDefinition());
 
-            var result0 = matcher.GetMatchingTargets(CecilUtility.Import(targets[0].Method));
-            var result1 = matcher.GetMatchingTargets(CecilUtility.Import(targets[1].Method));
+            var result0 = matcher.GetMatchingTargets(CecilUtility.Import(targets[0].Methods[0]));
+            var result1 = matcher.GetMatchingTargets(CecilUtility.Import(targets[1].Methods[0]));
 
             Assert.AreEqual(targets[0], result0.Single());
             Assert.AreEqual(targets[1], result1.Single());

@@ -44,12 +44,15 @@ namespace Smocks
         private readonly IModuleFilterFactory _moduleFilterFactory;
         private readonly IServiceLocator _serviceLocator;
         private readonly ISetupExtractor _setupExtractor;
+        private readonly IEventTargetExtractor _eventTargetExtractor;
 
         private Smock(IServiceLocator serviceLocator)
         {
             ArgumentChecker.NotNull(serviceLocator, () => serviceLocator);
 
             _setupExtractor = serviceLocator.Resolve<ISetupExtractor>();
+            _eventTargetExtractor = serviceLocator.Resolve<IEventTargetExtractor>();
+
             _dependencyGraphBuilder = serviceLocator.Resolve<IDependencyGraphBuilder>();
             _moduleFilterFactory = serviceLocator.Resolve<IModuleFilterFactory>();
 
@@ -121,9 +124,10 @@ namespace Smocks
         {
             var dependencyGraph = _dependencyGraphBuilder.BuildGraphForMethod(@delegate.Method);
             var setups = _setupExtractor.GetSetups(@delegate.Method, @delegate.Target).ToList();
+            var eventSetups = _eventTargetExtractor.GetTargets(@delegate.Method, @delegate.Target).ToList();
 
             var moduleFilter = _moduleFilterFactory.GetFilter(configuration.Scope, dependencyGraph);
-            var rewriter = new AssemblyRewriter(configuration, setups,
+            var rewriter = new AssemblyRewriter(configuration, setups.Concat(eventSetups),
                 _serviceLocator.Resolve<IMethodRewriter>(), moduleFilter);
             return rewriter;
         }

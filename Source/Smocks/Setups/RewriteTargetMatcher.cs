@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //// The MIT License (MIT)
 //// 
 //// Copyright (c) 2015 Tom van der Kleij
@@ -24,17 +24,32 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq.Expressions;
-using System.Reflection;
+using System.Linq;
+using Mono.Cecil;
+using Smocks.IL;
+using Smocks.Utility;
 
 namespace Smocks.Setups
 {
-    internal interface ISetupManager : IEnumerable<IInternalSetup>
+    internal class RewriteTargetMatcher : IRewriteTargetMatcher
     {
-        ISetup Create(Expression<Action> expression);
+        private readonly List<Tuple<IRewriteTarget, MethodReference>> _targets;
 
-        ISetup<TReturnValue> Create<TReturnValue>(Expression<Func<TReturnValue>> expression);
+        public RewriteTargetMatcher(IMethodImporter methodImporter, ReadOnlyCollection<IRewriteTarget> targets)
+        {
+            ArgumentChecker.NotNull(methodImporter, () => methodImporter);
+            ArgumentChecker.NotNull(targets, () => targets);
 
-        ReadOnlyCollection<IInternalSetup> GetSetupsForMethod(MethodBase target);
+            _targets = targets
+                .SelectMany(target => target.Methods, (target, method) => Tuple.Create(target, methodImporter.Import(method)))
+                .ToList();
+        }
+
+        public IEnumerable<IRewriteTarget> GetMatchingTargets(MethodReference method)
+        {
+            return _targets
+                .Where(pair => pair.Item2.FullName.Equals(method.FullName))
+                .Select(pair => pair.Item1);
+        }
     }
 }

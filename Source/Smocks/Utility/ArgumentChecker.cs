@@ -23,6 +23,7 @@
 
 using System;
 using System.Linq.Expressions;
+using Smocks.IL;
 
 namespace Smocks.Utility
 {
@@ -61,6 +62,22 @@ namespace Smocks.Utility
             if (argument == null)
             {
                 throw new ArgumentNullException(ExpressionHelper.GetField(selector).Name);
+            }
+        }
+
+        /// <summary>
+        /// Checks that the provided argument is not null.
+        /// </summary>
+        /// <typeparam name="T">The type of the argument.</typeparam>
+        /// <param name="argument">The argument.</param>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown if argument is null.</exception>
+        public static void NotNull<T>(T argument, string parameterName)
+            where T : class
+        {
+            if (argument == null)
+            {
+                throw new ArgumentNullException(parameterName);
             }
         }
     }
