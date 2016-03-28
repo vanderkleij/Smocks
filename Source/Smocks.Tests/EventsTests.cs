@@ -74,17 +74,19 @@ namespace Smocks.Tests
         [TestCase]
         public void Raise_NonStaticEvent_OriginalEventInvokesSubscribers()
         {
-            bool firstInvoked = false;
+            int invocationCount = 0;
 
             Smock.Run(context =>
             {
                 ClassWithEvents instance = new ClassWithEvents();
 
-                instance.TheEvent += (sender, args) => firstInvoked = true;
+                instance.TheEvent += (sender, args) => ++invocationCount;
+
                 instance.RaiseTheEvent(EventArgs.Empty);
+                context.Raise(() => instance.TheEvent += null, () => instance.TheEvent -= null, EventArgs.Empty);
             });
 
-            Assert.IsTrue(firstInvoked);
+            Assert.AreEqual(2, invocationCount);
         }
 
         [TestCase]
@@ -131,15 +133,16 @@ namespace Smocks.Tests
         [TestCase]
         public void Raise_StaticEvent_OriginalEventInvokesSubscribers()
         {
-            bool firstInvoked = false;
+            int invocationCount = 0;
 
             Smock.Run(context =>
             {
-                ClassWithEvents.StaticEvent += (sender, args) => firstInvoked = true;
+                ClassWithEvents.StaticEvent += (sender, args) => ++invocationCount;
                 ClassWithEvents.RaiseStaticEvent(EventArgs.Empty);
+                context.Raise(() => ClassWithEvents.StaticEvent += null, () => ClassWithEvents.StaticEvent -= null, default(EventArgs));
             });
 
-            Assert.IsTrue(firstInvoked);
+            Assert.AreEqual(2, invocationCount);
         }
 
         [TestCase]
