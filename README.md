@@ -2,6 +2,8 @@
 
 Smocks is an experimental framework for "static mocking" for .NET 4 and .NET 4.5. It is not a full-featured mocking framework, but rather a supplement to existing frameworks such as [moq](http://www.moqthis.com/). These frameworks typically do not support mocking of static or non-virtual methods and properties. Smocks fills the gap.
 
+As an example, you might want to unit test some code that uses the static property `DateTime.Now` to test if the code performs as expected at January 1st of the next year. Since `DateTime.Now` is static, it cannot be mocked by most conventional mocking frameworks. Smocks enables you to change the behaviour of such static properties, as well as other unmockables such as non-virtual methods and static methods.
+
 ## Usage
 
 Smocks uses some magic under the hood to mock the normally unmockable. This magic has its (technical) limitations though. Therefore it's very important that you [play by the rules](https://github.com/vanderkleij/Smocks/wiki/Technical-limitations). Most importantly: avoid using variables defined outside the scope of `Smocks.Run` unless you know what you're doing. These are some *valid* scenarios:
@@ -54,6 +56,17 @@ Smock.Run(context =>
 });
 ```
 
+### Events
+```C#
+Smock.Run(context =>
+{
+    Console.CancelKeyPress += (sender, args) => Console.WriteLine("CancelKeyPress handled");
+    
+    // Outputs "CancelKeyPress handled"
+    context.Raise(() => Console.CancelKeyPress += null, () => Console.CancelKeyPress -= null, default(EventArgs));
+});
+```
+
 ## Installation
 
 Available on [NuGet](https://www.nuget.org/packages/Smocks/):
@@ -68,9 +81,10 @@ PM> Install-Package Smocks
 - ~~`.Returns((arg1, arg2) => ...)`~~
 - ~~`.Callback((arg1, arg2) => ...)`~~
 - ~~Matching `It.Is<T>(x => ...)`~~
+- ~~Support for mocking events~~
 - Strong-named assemblies
 - `.SetupSet(() => ...)`
-- Support for mocking events
+
 
 ## Disclaimer
 This library is currently in alpha status. I expect plenty of bugs to still be present. Should you encounter any oddities, please submit an issue or pull request. Any feedback will be greatly appreciated.
