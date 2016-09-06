@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Moq;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace Smocks.Tests
@@ -67,6 +68,17 @@ namespace Smocks.Tests
             Smock.Run(context =>
             {
                 context.Setup(() => int.Parse(Matching.It.IsAny<string>())).Returns(expected);
+
+                Assert.AreEqual(expected, int.Parse("42"));
+            });
+        }
+
+        [TestCase(10)]
+        public void Setup_ArgAnyFromNSubstitute_MatchesAnyArgument(int expected)
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => int.Parse(Arg.Any<string>())).Returns(expected);
 
                 Assert.AreEqual(expected, int.Parse("42"));
             });
@@ -119,6 +131,17 @@ namespace Smocks.Tests
             Smock.Run(context =>
             {
                 context.Setup(() => string.Format(It.Is<string>(format => format == "A"))).Returns("Foo");
+
+                Assert.AreEqual("Foo", string.Format("A"));
+            });
+        }
+
+        [TestCase]
+        public void Setup_ArgIsArgumentFromNSubstitute_InvokesCallbackAndMatchesWhenItReturnsTrue()
+        {
+            Smock.Run(context =>
+            {
+                context.Setup(() => string.Format(Arg.Is<string>(format => format == "A"))).Returns("Foo");
 
                 Assert.AreEqual("Foo", string.Format("A"));
             });

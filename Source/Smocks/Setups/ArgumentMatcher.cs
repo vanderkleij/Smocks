@@ -55,9 +55,11 @@ namespace Smocks.Setups
         {
             for (int i = 0; i < setupArguments.Count; ++i)
             {
-                // Skip if the setup argument is It.IsAny<T>.
+                // Skip if the setup argument is It.IsAny<T> (moq/Smocks) or Arg.Any (NSubstitute).
                 // We match the call by name, so that both Smock's and Moq's It class can be used.
-                if (_expressionHelper.IsMethodInvocation(setupArguments[i], "It", "IsAny", 0))
+                bool isIsAny = _expressionHelper.IsMethodInvocation(setupArguments[i], "It", "IsAny", 0) ||
+                               _expressionHelper.IsMethodInvocation(setupArguments[i], "Arg", "Any", 0);
+                if (isIsAny)
                 {
                     continue;
                 }
@@ -65,7 +67,8 @@ namespace Smocks.Setups
                 object actualValue = actualArguments[i];
 
                 // Check if the setup argument is It.Is<T>(...).
-                bool isItIs = _expressionHelper.IsMethodInvocation(setupArguments[i], "It", "Is", 1);
+                bool isItIs = _expressionHelper.IsMethodInvocation(setupArguments[i], "It", "Is", 1) ||
+                              _expressionHelper.IsMethodInvocation(setupArguments[i], "Arg", "Is", 1);
                 if (isItIs)
                 {
                     if (!_itIsMatcher.ItIsMatch(setupArguments[i], actualValue))
