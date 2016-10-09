@@ -128,7 +128,7 @@ namespace Smocks
 
             var moduleFilter = _moduleFilterFactory.GetFilter(configuration.Scope, dependencyGraph);
             var rewriter = new AssemblyRewriter(configuration, setups.Concat(eventSetups),
-                _serviceLocator.Resolve<IMethodRewriter>(), moduleFilter);
+                _serviceLocator.Resolve<IMethodRewriter>(), moduleFilter, _serviceLocator.ResolveAll<IAssemblyPostProcessor>());
             return rewriter;
         }
 

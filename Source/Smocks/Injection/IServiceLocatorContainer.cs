@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 namespace Smocks.Injection
 {
@@ -70,5 +71,12 @@ namespace Smocks.Injection
         /// <param name="instance">The instance, if one could be resolved.</param>
         /// <returns>Whether an instance could be resolved.</returns>
         bool TryResolve(Type type, out object instance);
+
+        /// <summary>
+        /// Returns an instance of every registered implementation of the specified type.
+        /// </summary>
+        /// <typeparam name="TService">The type to resolve.</typeparam>
+        /// <returns>An instance of every registered implementation of the specified type.</returns>
+        IEnumerable<TService> ResolveAll<TService>();
     }
 }

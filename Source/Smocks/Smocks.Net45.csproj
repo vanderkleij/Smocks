@@ -103,6 +103,7 @@
     <Compile Include="IL\IArgumentGenerator.cs" />
     <Compile Include="IL\Filters\IModuleFilter.cs" />
     <Compile Include="IL\Filters\IModuleFilterFactory.cs" />
+    <Compile Include="IL\IAssemblyPostProcessor.cs" />
     <Compile Include="IL\IAssemblyRewriter.cs" />
     <Compile Include="IL\ICompiledMethod.cs" />
     <Compile Include="IL\IEventAccessorExtractor.cs" />
@@ -118,6 +119,8 @@
     <Compile Include="IL\ModuleReferenceComparer.cs" />
     <Compile Include="IL\Parameter.cs" />
     <Compile Include="IL\ParameterDeducer.cs" />
+    <Compile Include="IL\PostProcessors\AssemblyAttributesFilter.cs" />
+    <Compile Include="IL\PostProcessors\ModuleMvidPostProcessor.cs" />
     <Compile Include="IL\Resolvers\FieldResolver.cs" />
     <Compile Include="IL\Resolvers\GenericBindingContext.cs" />
     <Compile Include="IL\Resolvers\IFieldResolver.cs" />

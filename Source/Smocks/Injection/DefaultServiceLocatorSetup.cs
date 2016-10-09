@@ -28,6 +28,7 @@ using Mono.Cecil;
 using Smocks.IL;
 using Smocks.IL.Dependencies;
 using Smocks.IL.Filters;
+using Smocks.IL.PostProcessors;
 using Smocks.IL.Resolvers;
 using Smocks.Setups;
 using Smocks.Utility;
@@ -68,6 +69,9 @@ namespace Smocks.Injection
             container.RegisterSingleton<IInstructionHelper, InstructionHelper>();
             container.RegisterSingleton<IParameterDeducer, ParameterDeducer>();
             container.RegisterSingleton<IArgumentGenerator, ArgumentGenerator>();
+
+            container.RegisterSingleton<IAssemblyPostProcessor, AssemblyAttributesFilter>();
+            container.RegisterSingleton<IAssemblyPostProcessor, ModuleMvidPostProcessor>();
 
             container.RegisterSingleton<ITypeResolver, TypeResolver>();
             container.RegisterSingleton<IModuleResolver, ModuleResolver>();

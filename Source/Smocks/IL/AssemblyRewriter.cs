@@ -1,4 +1,5 @@
 ﻿#region License
+
 //// The MIT License (MIT)
 ////
 //// Copyright (c) 2015 Tom van der Kleij
@@ -19,6 +20,7 @@
 //// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 #endregion License
 
 using System;
@@ -38,11 +40,17 @@ namespace Smocks.IL
         private readonly Configuration _configuration;
         private readonly IMethodRewriter _methodRewriter;
         private readonly IModuleFilter _moduleFilter;
-        private readonly List<string> _rewrittenAssemblies = new List<string>();
+        private readonly IEnumerable<IAssemblyPostProcessor> _postProcessors;
         private readonly IRewriteTargetCollection _rewriteTargetCollection;
+        private readonly List<string> _rewrittenAssemblies = new List<string>();
 
         internal AssemblyRewriter(IMethodRewriter methodRewriter, IModuleFilter moduleFilter)
-            : this(new Configuration(), new List<SetupTarget>(), methodRewriter, moduleFilter)
+            : this(methodRewriter, moduleFilter, Enumerable.Empty<IAssemblyPostProcessor>())
+        {
+        }
+
+        internal AssemblyRewriter(IMethodRewriter methodRewriter, IModuleFilter moduleFilter, IEnumerable<IAssemblyPostProcessor> postProcessors)
+            : this(new Configuration(), new List<SetupTarget>(), methodRewriter, moduleFilter, postProcessors)
         {
         }
 
@@ -50,29 +58,34 @@ namespace Smocks.IL
             Configuration configuration,
             IRewriteTargetCollection rewriteTargetCollection,
             IMethodRewriter methodRewriter,
-            IModuleFilter moduleFilter)
+            IModuleFilter moduleFilter,
+            IEnumerable<IAssemblyPostProcessor> postProcessors)
         {
-            ArgumentChecker.NotNull(configuration, () => configuration);
-            ArgumentChecker.NotNull(rewriteTargetCollection, () => rewriteTargetCollection);
-            ArgumentChecker.NotNull(methodRewriter, () => methodRewriter);
-            ArgumentChecker.NotNull(moduleFilter, () => moduleFilter);
+            ArgumentChecker.NotNull(configuration, nameof(configuration));
+            ArgumentChecker.NotNull(rewriteTargetCollection, nameof(rewriteTargetCollection));
+            ArgumentChecker.NotNull(methodRewriter, nameof(methodRewriter));
+            ArgumentChecker.NotNull(moduleFilter, nameof(moduleFilter));
+            ArgumentChecker.NotNull(moduleFilter, nameof(postProcessors));
 
             _configuration = configuration;
             _rewriteTargetCollection = rewriteTargetCollection;
             _methodRewriter = methodRewriter;
             _moduleFilter = moduleFilter;
+            _postProcessors = postProcessors;
         }
 
         internal AssemblyRewriter(
                 Configuration configuration,
                 IEnumerable<IRewriteTarget> targets,
                 IMethodRewriter methodRewriter,
-                IModuleFilter moduleFilter)
+                IModuleFilter moduleFilter,
+                IEnumerable<IAssemblyPostProcessor> postProcessors)
             : this(
                 configuration,
                 new RewriteTargetCollection(targets),
                 methodRewriter,
-                moduleFilter)
+                moduleFilter,
+                postProcessors)
         {
         }
 
@@ -115,17 +128,19 @@ namespace Smocks.IL
                 return new AssemblyLoader(path);
             }
 
+            // Run a number of post-processing operations on the assembly: module mvid generation,
+            // assembly attribute filtering, etc.
+            foreach (var postProcessor in _postProcessors)
+            {
+                postProcessor.Process(assembly);
+            }
+
             string outputPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + Path.GetExtension(path));
 
             WriterParameters writerParameters = new WriterParameters
             {
                 WriteSymbols = hasSymbols
             };
-
-            foreach (var module in assembly.Modules)
-            {
-                module.Mvid = Guid.NewGuid();                
-            }
 
             assembly.Write(outputPath, writerParameters);
 

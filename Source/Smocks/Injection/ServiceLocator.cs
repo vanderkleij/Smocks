@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Smocks.Utility;
 
@@ -79,6 +80,11 @@ namespace Smocks.Injection
         public T Resolve<T>()
         {
             return _container.Resolve<T>();
+        }
+
+        public IEnumerable<T> ResolveAll<T>()
+        {
+            return _container.ResolveAll<T>();
         }
     }
 }

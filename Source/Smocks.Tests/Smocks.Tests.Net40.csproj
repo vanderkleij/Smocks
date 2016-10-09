@@ -45,6 +45,10 @@
     <AssemblyOriginatorKeyFile>..\Smocks.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Aspose.Cells, Version=9.0.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <HintPath>..\packages\Aspose.Cells.9.0.0\lib\net40\Aspose.Cells.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net40\Mono.Cecil.dll</HintPath>
@@ -130,6 +134,7 @@
     <Compile Include="Issues\IssueEightTests.cs" />
     <Compile Include="Issues\IssueElevenTests.cs" />
     <Compile Include="Issues\IssueTwelveTests.cs" />
+    <Compile Include="Issues\IssueTwentySixTests.cs" />
     <Compile Include="Logging\LoggerExtensionsTests.cs" />
     <Compile Include="MethodTests.cs" />
     <Compile Include="OutParameterTests.cs" />
