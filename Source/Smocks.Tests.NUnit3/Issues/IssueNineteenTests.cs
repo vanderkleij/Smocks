@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.dotMemoryUnit.Kernel;
 using NUnit.Framework;
 
 namespace Smocks.Tests.NUnit3.Issues
@@ -16,9 +15,6 @@ namespace Smocks.Tests.NUnit3.Issues
 
                 Assert.AreEqual(2000, DateTime.Now.Year);
             });
-
-            dotMemoryApi.GetSnapshot();
-            dotMemoryApi.SaveCollectedData(@"C:\Temp\memory");
         }
     }
 }
