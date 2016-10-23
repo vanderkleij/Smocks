@@ -143,5 +143,16 @@ namespace Smocks.Injection
         {
             return (T)_singletons.GetOrAdd(typeof(T), type => Create<T>());
         }
+
+        public void Dispose()
+        {
+            foreach (var disposable in _singletons.Values.OfType<IDisposable>())
+            {
+                disposable.Dispose();
+            }
+
+            _singletons.Clear();
+            _registrations.Clear();
+        }
     }
 }

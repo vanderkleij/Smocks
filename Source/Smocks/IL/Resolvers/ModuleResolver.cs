@@ -41,13 +41,10 @@ namespace Smocks.IL.Resolvers
 
             ModuleDefinition moduleDefinition = scope as ModuleDefinition;
 
-            if (moduleDefinition != null)
+            if (moduleDefinition?.Assembly != null)
             {
-                if (moduleDefinition.Assembly != null)
-                {
-                    var assembly = Assembly.Load(new AssemblyName(moduleDefinition.Assembly.FullName));
-                    return new AssemblyTypeContainer(assembly);
-                }
+                var assembly = Assembly.Load(new AssemblyName(moduleDefinition.Assembly.FullName));
+                return new AssemblyTypeContainer(assembly);
             }
 
             throw new NotImplementedException();

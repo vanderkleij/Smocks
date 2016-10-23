@@ -35,19 +35,19 @@ namespace Smocks.Tests.TestUtility
         public static MethodReference Import(MethodBase method)
         {
             ModuleDefinition module = ModuleDefinition.CreateModule("Dummy", ModuleKind.Dll);
-            return module.Import(method);
+            return module.ImportReference(method);
         }
 
         public static TypeReference Import(Type type)
         {
             ModuleDefinition module = ModuleDefinition.CreateModule("Dummy", ModuleKind.Dll);
-            return module.Import(type);
+            return module.ImportReference(type);
         }
 
         public static FieldReference Import(FieldInfo fieldInfo)
         {
             ModuleDefinition module = ModuleDefinition.CreateModule("Dummy", ModuleKind.Dll);
-            return module.Import(fieldInfo);
+            return module.ImportReference(fieldInfo);
         }
 
         public static MethodReference Import(Expression<Action> expression)

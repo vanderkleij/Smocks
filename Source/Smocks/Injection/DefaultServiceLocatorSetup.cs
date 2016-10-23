@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Mono.Cecil;
+using Smocks.AppDomains;
 using Smocks.IL;
 using Smocks.IL.Dependencies;
 using Smocks.IL.Filters;
@@ -59,6 +60,8 @@ namespace Smocks.Injection
             container.RegisterSingleton<IItIsMatcher, ItIsMatcher>();
 
             container.RegisterSingleton<IMethodDisassembler, MethodDisassembler>();
+            container.RegisterSingleton<IAssemblyResolver, CecilAssemblyResolver>();
+
             container.RegisterSingleton<IExpressionDecompiler<Expression>, ExpressionDecompiler<Expression>>();
             container.RegisterSingleton<IExpressionDecompiler<Action>, ExpressionDecompiler<Action>>();
             container.RegisterSingleton<IExpressionCompiler, ExpressionCompiler>();

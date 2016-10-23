@@ -37,6 +37,7 @@ namespace Smocks.IL
 {
     internal class AssemblyRewriter : IAssemblyRewriter
     {
+        private readonly IAssemblyResolver _assemblyResolver;
         private readonly Configuration _configuration;
         private readonly IMethodRewriter _methodRewriter;
         private readonly IModuleFilter _moduleFilter;
@@ -50,24 +51,27 @@ namespace Smocks.IL
         }
 
         internal AssemblyRewriter(IMethodRewriter methodRewriter, IModuleFilter moduleFilter, IEnumerable<IAssemblyPostProcessor> postProcessors)
-            : this(new Configuration(), new List<SetupTarget>(), methodRewriter, moduleFilter, postProcessors)
+            : this(new Configuration(), new CecilAssemblyResolver(), new List<SetupTarget>(), methodRewriter, moduleFilter, postProcessors)
         {
         }
 
         internal AssemblyRewriter(
             Configuration configuration,
+            IAssemblyResolver assemblyResolver,
             IRewriteTargetCollection rewriteTargetCollection,
             IMethodRewriter methodRewriter,
             IModuleFilter moduleFilter,
             IEnumerable<IAssemblyPostProcessor> postProcessors)
         {
             ArgumentChecker.NotNull(configuration, nameof(configuration));
+            ArgumentChecker.NotNull(assemblyResolver, nameof(assemblyResolver));
             ArgumentChecker.NotNull(rewriteTargetCollection, nameof(rewriteTargetCollection));
             ArgumentChecker.NotNull(methodRewriter, nameof(methodRewriter));
             ArgumentChecker.NotNull(moduleFilter, nameof(moduleFilter));
             ArgumentChecker.NotNull(moduleFilter, nameof(postProcessors));
 
             _configuration = configuration;
+            _assemblyResolver = assemblyResolver;
             _rewriteTargetCollection = rewriteTargetCollection;
             _methodRewriter = methodRewriter;
             _moduleFilter = moduleFilter;
@@ -76,12 +80,14 @@ namespace Smocks.IL
 
         internal AssemblyRewriter(
                 Configuration configuration,
+                IAssemblyResolver assemblyResolver,
                 IEnumerable<IRewriteTarget> targets,
                 IMethodRewriter methodRewriter,
                 IModuleFilter moduleFilter,
                 IEnumerable<IAssemblyPostProcessor> postProcessors)
             : this(
                 configuration,
+                assemblyResolver,
                 new RewriteTargetCollection(targets),
                 methodRewriter,
                 moduleFilter,
@@ -105,48 +111,55 @@ namespace Smocks.IL
             bool hasSymbols = File.Exists(Path.ChangeExtension(path, ".pdb"));
             bool rewritten = false;
 
-            ReaderParameters readerParameters = new ReaderParameters { ReadSymbols = hasSymbols };
-            AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly(path, readerParameters);
-
-            foreach (var module in assembly.Modules)
+            var readerParameters = new ReaderParameters
             {
-                if (_moduleFilter.Accepts(module))
-                {
-                    IRewriteTargetMatcher targetCollection = _rewriteTargetCollection.GetMatcher(module);
-
-                    var types = module.GetTypes().ToList();
-                    foreach (var type in types)
-                    {
-                        rewritten |= ProcessType(_configuration, type, targetCollection);
-                    }
-                }
-            }
-
-            if (!rewritten)
-            {
-                // No changes made: we can just load the original assembly.
-                return new AssemblyLoader(path);
-            }
-
-            // Run a number of post-processing operations on the assembly: module mvid generation,
-            // assembly attribute filtering, etc.
-            foreach (var postProcessor in _postProcessors)
-            {
-                postProcessor.Process(assembly);
-            }
-
-            string outputPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + Path.GetExtension(path));
-
-            WriterParameters writerParameters = new WriterParameters
-            {
-                WriteSymbols = hasSymbols
+                ReadSymbols = hasSymbols,
+                AssemblyResolver = _assemblyResolver,
+                SymbolReaderProvider = hasSymbols ? new FixedPdbReaderProvider() : null
             };
 
-            assembly.Write(outputPath, writerParameters);
+            using (AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly(path, readerParameters))
+            {
+                foreach (var module in assembly.Modules)
+                {
+                    if (_moduleFilter.Accepts(module))
+                    {
+                        IRewriteTargetMatcher targetCollection = _rewriteTargetCollection.GetMatcher(module);
 
-            _rewrittenAssemblies.Add(outputPath);
+                        var types = module.GetTypes().ToList();
+                        foreach (var type in types)
+                        {
+                            rewritten |= ProcessType(_configuration, type, targetCollection);
+                        }
+                    }
+                }
 
-            return new AssemblyLoader(outputPath);
+                if (!rewritten)
+                {
+                    // No changes made: we can just load the original assembly.
+                    return new AssemblyLoader(path);
+                }
+
+                // Run a number of post-processing operations on the assembly: module mvid generation,
+                // assembly attribute filtering, etc.
+                foreach (var postProcessor in _postProcessors)
+                {
+                    postProcessor.Process(assembly);
+                }
+
+                string outputPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + Path.GetExtension(path));
+
+                WriterParameters writerParameters = new WriterParameters
+                {
+                    WriteSymbols = hasSymbols
+                };
+
+                assembly.Write(outputPath, writerParameters);
+
+                _rewrittenAssemblies.Add(outputPath);
+
+                return new AssemblyLoader(outputPath);
+            }
         }
 
         private void Delete(string path)

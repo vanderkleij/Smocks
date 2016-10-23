@@ -40,7 +40,7 @@ namespace Smocks.IL
 
         public MethodReference Import(MethodBase method)
         {
-            return _moduleDefinition.Import(method);
+            return _moduleDefinition.ImportReference(method);
         }
     }
 }

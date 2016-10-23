@@ -30,7 +30,7 @@ namespace Smocks.Injection
     /// A dependency injection container. Used to register and subsequently
     /// resolve types.
     /// </summary>
-    public interface IServiceLocatorContainer
+    public interface IServiceLocatorContainer : IDisposable
     {
         /// <summary>
         /// Registers an implementation type for a service type.

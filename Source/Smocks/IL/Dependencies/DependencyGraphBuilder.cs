@@ -46,16 +46,18 @@ namespace Smocks.IL.Dependencies
 
         public DependencyGraph BuildGraphForMethod(MethodBase method)
         {
-            var disassembled = _disassembler.Disassemble(method);
-            var graph = new DependencyGraph(disassembled.ModuleDefinition, _moduleComparer);
-            var visitor = new DependencyGraphInstructionVisitor(graph, _moduleComparer);
-
-            foreach (var instruction in disassembled.Body.Instructions)
+            using (DisassembleResult disassembled = _disassembler.Disassemble(method))
             {
-                instruction.Accept(visitor);
-            }
+                var graph = new DependencyGraph(disassembled.ModuleDefinition, _moduleComparer);
+                var visitor = new DependencyGraphInstructionVisitor(graph, _moduleComparer);
 
-            return graph;
+                foreach (var instruction in disassembled.Body.Instructions)
+                {
+                    instruction.Accept(visitor);
+                }
+
+                return graph;
+            }
         }
 
         internal class DependencyGraphInstructionVisitor : InstructionVisitorBase<Unit>

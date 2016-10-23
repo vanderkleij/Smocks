@@ -24,6 +24,7 @@
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Mono.Cecil;
 using Smocks.AppDomains;
 using Smocks.IL;
 using Smocks.IL.Dependencies;
@@ -38,7 +39,7 @@ namespace Smocks
     /// This is the entry point for users of the library. Users can use
     /// the Run method to start a Smocks session.
     /// </summary>
-    public partial class Smock
+    public partial class Smock : IDisposable
     {
         private readonly IDependencyGraphBuilder _dependencyGraphBuilder;
         private readonly IModuleFilterFactory _moduleFilterFactory;
@@ -46,17 +47,17 @@ namespace Smocks
         private readonly ISetupExtractor _setupExtractor;
         private readonly IEventTargetExtractor _eventTargetExtractor;
 
-        private Smock(IServiceLocator serviceLocator)
+        private Smock(Configuration configuration)
         {
-            ArgumentChecker.NotNull(serviceLocator, () => serviceLocator);
+            ArgumentChecker.NotNull(configuration, nameof(configuration));
 
-            _setupExtractor = serviceLocator.Resolve<ISetupExtractor>();
-            _eventTargetExtractor = serviceLocator.Resolve<IEventTargetExtractor>();
+            _serviceLocator = CreateServiceLocator(configuration);
 
-            _dependencyGraphBuilder = serviceLocator.Resolve<IDependencyGraphBuilder>();
-            _moduleFilterFactory = serviceLocator.Resolve<IModuleFilterFactory>();
+            _setupExtractor = _serviceLocator.Resolve<ISetupExtractor>();
+            _eventTargetExtractor = _serviceLocator.Resolve<IEventTargetExtractor>();
 
-            _serviceLocator = serviceLocator;
+            _dependencyGraphBuilder = _serviceLocator.Resolve<IDependencyGraphBuilder>();
+            _moduleFilterFactory = _serviceLocator.Resolve<IModuleFilterFactory>();
         }
 
         /// <summary>
@@ -75,8 +76,10 @@ namespace Smocks
         /// <param name="action">The action.</param>
         public static void Run(Configuration configuration, Action<ISmocksContext> action)
         {
-            Smock context = new Smock(CreateServiceLocator(configuration));
-            context.RunAction(action, configuration);
+            using (Smock context = new Smock(configuration))
+            {
+                context.RunAction(action, configuration);
+            }
         }
 
         /// <summary>
@@ -111,13 +114,18 @@ namespace Smocks
 
         private static IServiceLocator CreateServiceLocator(Configuration configuration)
         {
-            return new ServiceLocator(new ServiceLocatorContainer(configuration.ServiceLocatorSetup));
+            var container = new ServiceLocatorContainer(configuration.ServiceLocatorSetup);
+            container.RegisterSingleton<Configuration, Configuration>(configuration);
+
+            return new ServiceLocator(container);
         }
 
         private static T RunInternal<T>(Func<ISmocksContext, T> func, Configuration configuration)
         {
-            Smock context = new Smock(CreateServiceLocator(configuration));
-            return context.RunFunc(func, configuration);
+            using (Smock context = new Smock(configuration))
+            {
+                return context.RunFunc(func, configuration);
+            }
         }
 
         private IAssemblyRewriter CreateAssemblyRewriter(Delegate @delegate, Configuration configuration)
@@ -127,7 +135,9 @@ namespace Smocks
             var eventSetups = _eventTargetExtractor.GetTargets(@delegate.Method, @delegate.Target).ToList();
 
             var moduleFilter = _moduleFilterFactory.GetFilter(configuration.Scope, dependencyGraph);
-            var rewriter = new AssemblyRewriter(configuration, setups.Concat(eventSetups),
+            var assemblyResolver = _serviceLocator.Resolve<IAssemblyResolver>();
+
+            var rewriter = new AssemblyRewriter(configuration, assemblyResolver, setups.Concat(eventSetups),
                 _serviceLocator.Resolve<IMethodRewriter>(), moduleFilter, _serviceLocator.ResolveAll<IAssemblyPostProcessor>());
             return rewriter;
         }
@@ -155,6 +165,11 @@ namespace Smocks
                 context.Invoke(new Action(() => ServiceLocator.Instance = CreateServiceLocator(configuration)));
                 return context.Invoke(func, _serviceLocator.Resolve<ISmocksContext>());
             }
+        }
+
+        public void Dispose()
+        {
+            _serviceLocator.Dispose();
         }
     }
 }

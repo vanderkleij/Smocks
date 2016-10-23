@@ -21,6 +21,7 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 namespace Smocks.Injection
@@ -28,7 +29,7 @@ namespace Smocks.Injection
     /// <summary>
     /// A service locator used for dependency injection.
     /// </summary>
-    public interface IServiceLocator
+    public interface IServiceLocator : IDisposable
     {
         /// <summary>
         /// Gets the container.

@@ -23,6 +23,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using Smocks.AppDomains;
 using Smocks.IL;
 using Smocks.IL.Dependencies;
 using Smocks.Tests.TestUtility;
@@ -33,10 +34,12 @@ namespace Smocks.Tests.IL.Dependencies
     [TestFixture]
     public class DependencyGraphBuilderTests
     {
+        private static readonly MethodDisassembler Disassembler = new MethodDisassembler(new CecilAssemblyResolver());
+
         [TestCase]
         public void BuildGraphForMethod_MethodCallAndTokenLoad_ReturnsCorrectDependencies()
         {
-            var subject = new DependencyGraphBuilder(new MethodDisassembler(), new ModuleReferenceComparer());
+            var subject = new DependencyGraphBuilder(Disassembler, new ModuleReferenceComparer());
             var result = subject.BuildGraphForMethod(ReflectionUtility.GetLambdaMethod(() =>
             {
                 Console.WriteLine(typeof(DependencyGraphBuilderTests));
@@ -58,7 +61,7 @@ namespace Smocks.Tests.IL.Dependencies
         public void Constructor_ModuleComparerNull_ThrowsArgumentNullException()
         {
             var exception = Assert.Throws<ArgumentNullException>(
-                () => new DependencyGraphBuilder(new MethodDisassembler(), null));
+                () => new DependencyGraphBuilder(Disassembler, null));
 
             Assert.AreEqual("moduleComparer", exception.ParamName);
         }

@@ -124,7 +124,7 @@ namespace Smocks.IL
                         .ToList();
 
                 List<VariableDefinition> variables = body.Variables.ToList();
-                VariableDefinition resultVariable = new VariableDefinition(body.Method.Module.Import(typeof(TExpression)));
+                VariableDefinition resultVariable = new VariableDefinition(body.Method.Module.ImportReference(typeof(TExpression)));
                 variables.Add(resultVariable);
 
                 for (int i = 0; i < expectedStackSize; ++i)

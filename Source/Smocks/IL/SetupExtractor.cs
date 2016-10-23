@@ -57,12 +57,13 @@ namespace Smocks.IL
 
         public IEnumerable<SetupTarget> GetSetups(MethodBase method, object target)
         {
-            DisassembleResult disassembleResult = _methodDisassembler.Disassemble(method);
+            using (DisassembleResult disassembleResult = _methodDisassembler.Disassemble(method))
+            {
+                List<MethodDefinition> setupMethods = _setupMethods.Select(setupMethod =>
+                    disassembleResult.ModuleDefinition.ImportReference(setupMethod).Resolve()).ToList();
 
-            List<MethodDefinition> setupMethods = _setupMethods.Select(setupMethod =>
-                disassembleResult.ModuleDefinition.Import(setupMethod).Resolve()).ToList();
-
-            return GetSetupsFromInstructions(target, disassembleResult.Body, setupMethods);
+                return GetSetupsFromInstructions(target, disassembleResult.Body, setupMethods);
+            }
         }
 
         public IEnumerable<SetupTarget> GetSetups(MethodBase method)
