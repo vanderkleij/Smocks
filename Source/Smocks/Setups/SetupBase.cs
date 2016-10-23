@@ -36,26 +36,17 @@ namespace Smocks.Setups
             MethodCall = methodCall;
         }
 
-        public int ArgumentsToSkipInCallbacks
-        {
-            get { return (MethodCall.Method.IsStatic || MethodCall.Method.IsConstructor) ? 0 : 1; }
-        }
+        public int ArgumentsToSkipInCallbacks => (MethodCall.Method.IsStatic || MethodCall.Method.IsConstructor) ? 0 : 1;
 
         public Action<object[]> CallbackAction { get; set; }
 
         public Lazy<Exception> Exception { get; private set; }
 
-        public MethodCallInfo MethodCall { get; private set; }
+        public MethodCallInfo MethodCall { get; }
 
         public bool Verify { get; private set; }
 
-        protected int ParameterCount
-        {
-            get
-            {
-                return MethodCall.Method.GetParameters().Length;
-            }
-        }
+        protected int ParameterCount => MethodCall.Method.GetParameters().Length;
 
         public void Throws<TException>() where TException : Exception, new()
         {

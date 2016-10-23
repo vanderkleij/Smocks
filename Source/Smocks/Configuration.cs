@@ -35,7 +35,6 @@ namespace Smocks
     /// </summary>
     public class Configuration : MarshalByRefObject
     {
-        private Scope _scope = Scope.DirectReferences;
         private IServiceLocatorSetup _serviceLocatorSetup = new DefaultServiceLocatorSetup();
 
         /// <summary>
@@ -53,11 +52,7 @@ namespace Smocks
         /// Gets or sets the scope of Smocks: should it rewrite only direct references
         /// or rewrite any loaded assembly.
         /// </summary>
-        public Scope Scope
-        {
-            get { return _scope; }
-            set { _scope = value; }
-        }
+        public Scope Scope { get; set; } = Scope.DirectReferences;
 
         /// <summary>
         /// Gets or sets the service locator setup.

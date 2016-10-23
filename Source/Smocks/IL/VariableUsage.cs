@@ -47,17 +47,17 @@ namespace Smocks.IL
         /// <summary>
         /// Gets the index.
         /// </summary>
-        public int Index { get; private set; }
+        public int Index { get; }
 
         /// <summary>
         /// Gets the operation.
         /// </summary>
-        public VariableOperation Operation { get; private set; }
+        public VariableOperation Operation { get; }
 
         /// <summary>
         /// Gets the instruction.
         /// </summary>
-        public Instruction Instruction { get; private set; }
+        public Instruction Instruction { get; }
 
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
@@ -68,7 +68,7 @@ namespace Smocks.IL
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return string.Format("{0} {1}", Operation, Index);
+            return $"{Operation} {Index}";
         }
     }
 }

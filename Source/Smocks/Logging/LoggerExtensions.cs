@@ -85,10 +85,7 @@ namespace Smocks.Logging
 
         private static void Log(LogLevel level, Logger logger, string format, object[] arguments)
         {
-            if (logger != null)
-            {
-                logger.Log(level, string.Format(format, arguments));
-            }
+            logger?.Log(level, string.Format(format, arguments));
         }
     }
 }

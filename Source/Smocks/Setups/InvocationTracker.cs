@@ -85,20 +85,20 @@ namespace Smocks.Setups
 
         private class Invocation
         {
+            private readonly object[] _arguments;
+
             public Invocation(IInternalSetup matchedSetup, object[] arguments)
             {
                 MatchedSetup = matchedSetup;
-                Arguments = arguments;
+                _arguments = arguments;
             }
 
-            public object[] Arguments { get; private set; }
-
-            public IInternalSetup MatchedSetup { get; private set; }
+            public IInternalSetup MatchedSetup { get; }
 
             [ExcludeFromCodeCoverage]
             public override string ToString()
             {
-                return string.Join(", ", Arguments ?? new object[0]);
+                return string.Join(", ", _arguments ?? new object[0]);
             }
         }
     }

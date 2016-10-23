@@ -101,7 +101,7 @@ namespace Smocks.IL.Visitors
                     return VisitInlineMethod(instruction, (MethodReference)instruction.Operand);
             }
 
-            throw new NotImplementedException(string.Format("Unexpected opcode: {0}", instruction.OpCode.Code));
+            throw new NotImplementedException($"Unexpected opcode: {instruction.OpCode.Code}");
         }
 
         public override int VisitInlineMethod(Instruction instruction, MethodReference operand)

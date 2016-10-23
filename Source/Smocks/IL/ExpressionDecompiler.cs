@@ -129,14 +129,9 @@ namespace Smocks.IL
 
                 for (int i = 0; i < expectedStackSize; ++i)
                 {
-                    if (i == stackEntriesToSkip)
-                    {
-                        instructions.Add(Instruction.Create(OpCodes.Stloc, resultVariable));
-                    }
-                    else
-                    {
-                        instructions.Add(Instruction.Create(OpCodes.Pop));
-                    }
+                    instructions.Add(i == stackEntriesToSkip
+                        ? Instruction.Create(OpCodes.Stloc, resultVariable)
+                        : Instruction.Create(OpCodes.Pop));
                 }
 
                 instructions.Add(Instruction.Create(OpCodes.Ldloc, resultVariable));

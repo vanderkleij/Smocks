@@ -35,7 +35,7 @@ namespace Smocks.Tests
             Smock.Run(context =>
             {
                 ClassWithEvents first = new ClassWithEvents();
-                first.EventWithReturnValue += (value) => value.ToString();
+                first.EventWithReturnValue += value => value.ToString();
 
                 object result = context.Raise(() => first.EventWithReturnValue += null,
                     () => first.EventWithReturnValue -= null, 42);

@@ -51,7 +51,7 @@ namespace Smocks.IL
                 {
                     if (parameterTypes[0].IsInstanceOfType(target) == false)
                     {
-                        throw new ArgumentException("Target not assignable to first parameter", "target");
+                        throw new ArgumentException("Target not assignable to first parameter", nameof(target));
                     }
 
                     yield return target;

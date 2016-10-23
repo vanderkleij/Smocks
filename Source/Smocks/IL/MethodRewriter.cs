@@ -59,12 +59,12 @@ namespace Smocks.IL
         public bool Rewrite(Configuration configuration, MethodDefinition method,
             IRewriteTargetMatcher rewriteTargetMatcher)
         {
-            bool rewritten = false;
-
             if (method.Body == null)
             {
-                return rewritten;
+                return false;
             }
+
+            bool rewritten = false;
 
             ILProcessor processor = method.Body.GetILProcessor();
 

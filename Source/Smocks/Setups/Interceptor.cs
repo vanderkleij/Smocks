@@ -141,10 +141,7 @@ namespace Smocks.Setups
                 throw setup.Exception.Value;
             }
 
-            if (setup.CallbackAction != null)
-            {
-                setup.CallbackAction(arguments.Skip(setup.ArgumentsToSkipInCallbacks).ToArray());
-            }
+            setup.CallbackAction?.Invoke(arguments.Skip(setup.ArgumentsToSkipInCallbacks).ToArray());
 
             HandleOutParameters(arguments, setup, originalMethod);
         }

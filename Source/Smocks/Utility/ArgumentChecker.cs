@@ -23,7 +23,6 @@
 
 using System;
 using System.Linq.Expressions;
-using Smocks.IL;
 
 namespace Smocks.Utility
 {

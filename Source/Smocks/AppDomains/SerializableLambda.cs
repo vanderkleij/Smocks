@@ -73,7 +73,7 @@ namespace Smocks.AppDomains
         internal static SerializableLambda Create(Action action, ISerializer serializer)
         {
             MethodInfo method = action.Method;
-            Type targetType = action.Target != null ? action.Target.GetType() : null;
+            Type targetType = action.Target?.GetType();
             var serializedTarget = action.Target != null ? serializer.Serialize(action.Target) : null;
 
             return new SerializableLambda(method, targetType, serializedTarget);
@@ -170,7 +170,7 @@ namespace Smocks.AppDomains
         internal static SerializableLambda<TReturnValue> Create(Delegate func, ISerializer serializer)
         {
             MethodInfo method = func.Method;
-            Type targetType = func.Target != null ? func.Target.GetType() : null;
+            Type targetType = func.Target?.GetType();
             Dictionary<string, object> targetValues = serializer.Serialize(func.Target);
 
             return new SerializableLambda<TReturnValue>(method, targetType, targetValues);

@@ -92,10 +92,7 @@ namespace Smocks.AppDomains
             resolver.AssemblyLoaderFactory = assemblyLoaderFactory;
         }
 
-        public AppDomain AppDomain
-        {
-            get { return _appDomain; }
-        }
+        public AppDomain AppDomain => _appDomain;
 
         public void Dispose()
         {

@@ -91,12 +91,12 @@ namespace Smocks.IL
         {
             if (count == 0)
             {
-                throw new ArgumentException(string.Format("Could not find {0} accessor", accessorKind), parameterName);
+                throw new ArgumentException($"Could not find {accessorKind} accessor", parameterName);
             }
 
             if (count > 1)
             {
-                throw new ArgumentException(string.Format("Found more than one {0} accessor", accessorKind), parameterName);
+                throw new ArgumentException($"Found more than one {accessorKind} accessor", parameterName);
             }
         }
 

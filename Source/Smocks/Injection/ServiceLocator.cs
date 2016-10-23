@@ -72,10 +72,7 @@ namespace Smocks.Injection
         /// <summary>
         /// Gets the container.
         /// </summary>
-        public IServiceLocatorContainer Container
-        {
-            get { return _container; }
-        }
+        public IServiceLocatorContainer Container => _container;
 
         /// <summary>
         /// Resolves the specified type.

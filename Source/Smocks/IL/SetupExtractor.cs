@@ -119,8 +119,7 @@ namespace Smocks.IL
 
                     if (methodCall == null)
                     {
-                        string message = string.Format(
-                            "Could not extract method from expression {0}", expression);
+                        string message = $"Could not extract method from expression {expression}";
                         throw new SetupExtractionException(message);
                     }
 

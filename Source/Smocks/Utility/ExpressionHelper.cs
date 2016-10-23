@@ -42,10 +42,7 @@ namespace Smocks.Utility
 
         public FieldInfo GetField(MemberExpression expression)
         {
-            if (expression == null)
-                return null;
-
-            return expression.Member as FieldInfo;
+            return expression?.Member as FieldInfo;
         }
 
         public MethodCallInfo GetMethod(LambdaExpression expression)
@@ -74,10 +71,7 @@ namespace Smocks.Utility
 
         public PropertyInfo GetProperty(MemberExpression expression)
         {
-            if (expression == null)
-                return null;
-
-            return expression.Member as PropertyInfo;
+            return expression?.Member as PropertyInfo;
         }
 
         public MethodCallInfo GetPropertyGetCall(LambdaExpression expression)
@@ -108,10 +102,9 @@ namespace Smocks.Utility
 
             MethodCallInfo method = GetMethod(expression);
 
-            return method != null &&
-                method.Method != null &&
-                string.Equals(method.Method.Name, methodName) &&
-                string.Equals(method.Method.DeclaringType.Name, typeName) &&
+            return method?.Method != null && 
+                string.Equals(method.Method.Name, methodName) && 
+                string.Equals(method.Method.DeclaringType.Name, typeName) && 
                 method.Method.GetParameters().Length == parameters;
         }
 
@@ -142,10 +135,7 @@ namespace Smocks.Utility
 
         private MethodCallInfo GetPropertyGetCall(MemberExpression expression)
         {
-            if (expression == null)
-                return null;
-
-            PropertyInfo property = expression.Member as PropertyInfo;
+            PropertyInfo property = expression?.Member as PropertyInfo;
 
             if (property == null)
                 return null;

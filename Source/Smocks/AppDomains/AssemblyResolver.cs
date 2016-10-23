@@ -102,7 +102,7 @@ namespace Smocks.AppDomains
             }
 
             IAssemblyLoader loader = AssemblyLoaderFactory.GetLoaderForAssembly(assemblyName);
-            result = loader != null ? loader.Load() : null;
+            result = loader?.Load();
 
             if (result != null)
             {

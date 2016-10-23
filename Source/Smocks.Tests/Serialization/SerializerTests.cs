@@ -48,8 +48,10 @@ namespace Smocks.Tests.Serialization
         {
             var subject = new Serializer();
 
-            var values = new Dictionary<string, object>();
-            values["Value"] = expected;
+            var values = new Dictionary<string, object>
+            {
+                ["Value"] = expected
+            };
 
             var result = subject.Deserialize(typeof(string), values);
 
@@ -67,8 +69,11 @@ namespace Smocks.Tests.Serialization
 
         private Dictionary<string, object> CreateDictionary(string key, object value)
         {
-            var result = new Dictionary<string, object>();
-            result[key] = value;
+            var result = new Dictionary<string, object>
+            {
+                [key] = value
+            };
+
             return result;
         }
 

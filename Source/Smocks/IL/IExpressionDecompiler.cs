@@ -21,7 +21,6 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using System.Linq.Expressions;
 using Mono.Cecil.Cil;
 
 namespace Smocks.IL
