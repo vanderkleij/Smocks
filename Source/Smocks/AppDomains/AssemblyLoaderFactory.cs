@@ -51,6 +51,7 @@ namespace Smocks.AppDomains
         public void Dispose()
         {
             _assemblyRewriter.Dispose();
+            _knownAssemblies.Clear();
         }
 
         public IAssemblyLoader GetLoaderForAssembly(AssemblyName assemblyName)

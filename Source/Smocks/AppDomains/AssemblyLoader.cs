@@ -44,7 +44,7 @@ namespace Smocks.AppDomains
         /// <summary>
         /// Gets the path of the <see cref="Assembly"/> to load.
         /// </summary>
-        public string Path { get; private set; }
+        public string Path { get; }
 
         /// <summary>
         /// Loads the assembly associated with this loader into the current <see cref="AppDomain" />.

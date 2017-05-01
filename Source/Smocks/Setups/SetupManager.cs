@@ -51,7 +51,7 @@ namespace Smocks.Setups
 
             if (methodCall == null)
             {
-                throw new ArgumentException("Not a method", "expression");
+                throw new ArgumentException("Not a method", nameof(expression));
             }
 
             var setup = new Setup(methodCall);
@@ -67,7 +67,7 @@ namespace Smocks.Setups
 
             if (methodCall == null)
             {
-                throw new ArgumentException("Not a method or property", "expression");
+                throw new ArgumentException("Not a method or property", nameof(expression));
             }
 
             var setup = new Setup<TReturnValue>(methodCall);

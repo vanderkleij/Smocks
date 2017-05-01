@@ -39,11 +39,14 @@ namespace Smocks.IL
         private const string CecilConstructorName = ".ctor";
 
         private static readonly MethodBase GetMethodFromHandleMethod =
-            typeof(MethodBase).GetMethod("GetMethodFromHandle", new[] { typeof(RuntimeMethodHandle) });
+            typeof(MethodBase).GetMethod(nameof(MethodBase.GetMethodFromHandle), new[] { typeof(RuntimeMethodHandle) });
 
-        private static readonly MethodBase HookMethod = typeof(Interceptor).GetMethod("Intercept");
-        private static readonly MethodBase HookVoidMethod = typeof(Interceptor).GetMethod("InterceptVoid");
-        private static readonly PropertyInfo InterceptedProperty = typeof(InterceptorResult).GetProperty("Intercepted");
+        private static readonly MethodBase HookMethod = typeof(Interceptor).GetMethod(nameof(Interceptor.Intercept));
+
+        private static readonly MethodBase HookVoidEventMethod = typeof(EventInterceptor).GetMethod(nameof(EventInterceptor.InterceptVoidEvent));
+        private static readonly MethodBase HookVoidMethod = typeof(Interceptor).GetMethod(nameof(Interceptor.InterceptVoid));
+        private static readonly PropertyInfo InterceptedProperty = typeof(InterceptorResult).GetProperty(nameof(InterceptorResult.Intercepted));
+
         private readonly IInstructionHelper _instructionHelper;
 
         internal MethodRewriter(IInstructionHelper instructionHelper)
@@ -54,14 +57,14 @@ namespace Smocks.IL
         }
 
         public bool Rewrite(Configuration configuration, MethodDefinition method,
-            ISetupTargetMatcher setupTargetMatcher)
+            IRewriteTargetMatcher rewriteTargetMatcher)
         {
-            bool rewritten = false;
-
             if (method.Body == null)
             {
-                return rewritten;
+                return false;
             }
+
+            bool rewritten = false;
 
             ILProcessor processor = method.Body.GetILProcessor();
 
@@ -71,7 +74,7 @@ namespace Smocks.IL
                 MethodReference calledMethod;
                 if (_instructionHelper.TryGetCall(instruction, out calledMethod))
                 {
-                    var targets = setupTargetMatcher.GetMatchingTargets(calledMethod).ToList();
+                    List<IRewriteTarget> targets = rewriteTargetMatcher.GetMatchingTargets(calledMethod).ToList();
 
                     if (targets.Count == 0)
                     {
@@ -89,10 +92,10 @@ namespace Smocks.IL
             return rewritten;
         }
 
-        private static MethodReference GetInterceptorMethod(MethodReference originalMethod, bool isVoidMethod)
+        private static MethodReference GetInterceptorMethod(MethodReference originalMethod, bool isVoidMethod, EventRewriteTarget eventTarget)
         {
-            MethodBase replacementMethod = isVoidMethod ? HookVoidMethod : HookMethod;
-            MethodReference importedReplacement = originalMethod.Module.Import(replacementMethod);
+            MethodBase replacementMethod = GetReplacementMethod(isVoidMethod, isEvent: eventTarget != null);
+            MethodReference importedReplacement = originalMethod.Module.ImportReference(replacementMethod);
 
             bool isGenericHookMethod = importedReplacement.HasGenericParameters;
 
@@ -100,9 +103,16 @@ namespace Smocks.IL
             {
                 GenericInstanceMethod boundMethod = new GenericInstanceMethod(importedReplacement);
 
-                TypeReference returnValue = GetReturnValue(originalMethod);
+                if (eventTarget != null)
+                {
+                    boundMethod.GenericArguments.Add(originalMethod.Module.ImportReference(eventTarget.EventHandlerType));
+                }
 
-                boundMethod.GenericArguments.Add(returnValue);
+                if (!isVoidMethod)
+                {
+                    TypeReference returnValue = GetReturnValue(originalMethod);
+                    boundMethod.GenericArguments.Add(returnValue);
+                }
 
                 importedReplacement = boundMethod;
             }
@@ -124,6 +134,18 @@ namespace Smocks.IL
             return parameterTypes;
         }
 
+        private static MethodBase GetReplacementMethod(bool isVoidMethod, bool isEvent)
+        {
+            if (isEvent && !isVoidMethod)
+            {
+                throw new InvalidOperationException("An event accessor should always return void");
+            }
+
+            return isEvent
+                ? HookVoidEventMethod
+                : (isVoidMethod ? HookVoidMethod : HookMethod);
+        }
+
         private static TypeReference GetReturnValue(MethodReference originalMethod)
         {
             TypeReference returnValue = IsConstructor(originalMethod)
@@ -137,6 +159,12 @@ namespace Smocks.IL
         private static bool IsConstructor(MethodReference method)
         {
             return method.Name == CecilConstructorName;
+        }
+
+        private static void PushMethod(RewriteContext context, MethodReference method)
+        {
+            context.Insert(Instruction.Create(OpCodes.Ldtoken, method));
+            context.Insert(Instruction.Create(OpCodes.Call, context.Method.Module.ImportReference(GetMethodFromHandleMethod)));
         }
 
         private static TypeReference ResolveGenericParameters(TypeReference typeReference, MethodReference method)
@@ -154,7 +182,7 @@ namespace Smocks.IL
 
         private static TypeReference StripByReference(RewriteContext context, TypeReference type)
         {
-            return context.Method.Module.Import(type.Resolve());
+            return context.Method.Module.ImportReference(type.Resolve());
         }
 
         private void CopyReferenceParametersToAddress(RewriteContext context,
@@ -172,7 +200,7 @@ namespace Smocks.IL
                     // Push value from arguments array
                     context.Insert(Instruction.Create(OpCodes.Ldloc, arrayVariable));
                     context.Insert(Instruction.Create(OpCodes.Ldc_I4, i));
-                    context.Insert(Instruction.Create(OpCodes.Ldelem_Any, context.Method.Module.Import(typeof(object))));
+                    context.Insert(Instruction.Create(OpCodes.Ldelem_Any, context.Method.Module.ImportReference(typeof(object))));
                     context.Insert(Instruction.Create(OpCodes.Unbox_Any, variableType));
 
                     // Copy value to address
@@ -185,10 +213,10 @@ namespace Smocks.IL
         {
             if (isVoidMethod)
             {
-                return method.Module.Import(typeof(InterceptorResult));
+                return method.Module.ImportReference(typeof(InterceptorResult));
             }
 
-            TypeReference unbound = method.Module.Import(typeof(InterceptorResult<>));
+            TypeReference unbound = method.Module.ImportReference(typeof(InterceptorResult<>));
 
             var bound = new GenericInstanceType(unbound);
 
@@ -229,12 +257,19 @@ namespace Smocks.IL
 
         private VariableDefinition InvokeReplacementMethod(RewriteContext context, VariableDefinition arrayVariable, bool isVoidMethod)
         {
-            var importedReplacement = GetInterceptorMethod(context.Method, isVoidMethod);
+            EventRewriteTarget eventTarget = context.Targets[0] as EventRewriteTarget;
+
+            var importedReplacement = GetInterceptorMethod(context.Method, isVoidMethod, eventTarget);
 
             context.Insert(Instruction.Create(OpCodes.Ldloc, arrayVariable));
 
-            context.Insert(Instruction.Create(OpCodes.Ldtoken, context.Method));
-            context.Insert(Instruction.Create(OpCodes.Call, context.Method.Module.Import(GetMethodFromHandleMethod)));
+            PushMethod(context, context.Method);
+
+            if (eventTarget != null)
+            {
+                PushMethod(context, context.Method.Module.ImportReference(eventTarget.AddMethod));
+                PushMethod(context, context.Method.Module.ImportReference(eventTarget.RemoveMethod));
+            }
 
             context.Insert(Instruction.Create(OpCodes.Call, importedReplacement));
 
@@ -250,12 +285,12 @@ namespace Smocks.IL
         {
             if (!isVoidMethod)
             {
-                var type = context.Method.Module.Import(typeof(InterceptorResult<>));
+                var type = context.Method.Module.ImportReference(typeof(InterceptorResult<>));
                 var genericType = new GenericInstanceType(type);
                 genericType.GenericArguments.Add(GetReturnValue(context.Method));
 
                 var returnValueProperty = type.Resolve().Properties.First(property => property.Name == "ReturnValue");
-                var getMethod = context.Method.Module.Import(returnValueProperty.GetMethod);
+                var getMethod = context.Method.Module.ImportReference(returnValueProperty.GetMethod);
                 getMethod.DeclaringType = genericType;
 
                 context.Insert(Instruction.Create(OpCodes.Ldloc, interceptorResultVariable));
@@ -290,7 +325,7 @@ namespace Smocks.IL
             Instruction invokeOriginalStartInstruction = InvokeOriginalMethod(context, variables);
 
             // Inject an instruction to jump based on whether the instruction was intercepted.
-            var interceptedPropertyGetter = context.Method.Module.Import(InterceptedProperty.GetGetMethod());
+            var interceptedPropertyGetter = context.Method.Module.ImportReference(InterceptedProperty.GetGetMethod());
             context.InsertAfter(currentPosition, new[]
             {
                 Instruction.Create(OpCodes.Ldloc, interceptorResultVariable),
@@ -299,7 +334,7 @@ namespace Smocks.IL
             });
 
             context.Processor.Remove(context.OriginalInstruction);
-            
+
             context.Processor.Body.OptimizeMacros();
         }
 
@@ -339,11 +374,11 @@ namespace Smocks.IL
 
         private VariableDefinition StoreVariablesInObjectArray(RewriteContext context, List<VariableDefinition> variables)
         {
-            var arrayVariable = new VariableDefinition(context.Method.Module.Import(typeof(Object[])));
+            var arrayVariable = new VariableDefinition(context.Method.Module.ImportReference(typeof(Object[])));
             context.Processor.Body.Variables.Add(arrayVariable);
 
             context.Insert(Instruction.Create(OpCodes.Ldc_I4, variables.Count));
-            context.Insert(Instruction.Create(OpCodes.Newarr, context.Method.Module.Import(typeof(Object))));
+            context.Insert(Instruction.Create(OpCodes.Newarr, context.Method.Module.ImportReference(typeof(Object))));
 
             context.Insert(Instruction.Create(OpCodes.Stloc, arrayVariable));
 

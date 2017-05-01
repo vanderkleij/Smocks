@@ -23,10 +23,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Mono.Cecil;
+using Smocks.AppDomains;
 using Smocks.IL;
 using Smocks.IL.Dependencies;
 using Smocks.IL.Filters;
+using Smocks.IL.PostProcessors;
 using Smocks.IL.Resolvers;
 using Smocks.Setups;
 using Smocks.Utility;
@@ -47,7 +50,9 @@ namespace Smocks.Injection
         {
             container.RegisterSingleton<ISetupManager, SetupManager>();
             container.RegisterSingleton<IInvocationTracker, InvocationTracker>();
+
             container.RegisterSingleton<Interceptor, Interceptor>();
+            container.RegisterSingleton<EventInterceptor, EventInterceptor>();
 
             container.RegisterSingleton<ISetupMatcher, SetupMatcher>();
             container.RegisterSingleton<ITargetMatcher, TargetMatcher>();
@@ -55,7 +60,10 @@ namespace Smocks.Injection
             container.RegisterSingleton<IItIsMatcher, ItIsMatcher>();
 
             container.RegisterSingleton<IMethodDisassembler, MethodDisassembler>();
-            container.RegisterSingleton<IExpressionDecompiler, ExpressionDecompiler>();
+            container.RegisterSingleton<IAssemblyResolver, CecilAssemblyResolver>();
+
+            container.RegisterSingleton<IExpressionDecompiler<Expression>, ExpressionDecompiler<Expression>>();
+            container.RegisterSingleton<IExpressionDecompiler<Action>, ExpressionDecompiler<Action>>();
             container.RegisterSingleton<IExpressionCompiler, ExpressionCompiler>();
             container.RegisterSingleton<IExpressionHelper, ExpressionHelper>();
             container.RegisterSingleton<IInstructionsCompiler, DynamicMethodCompiler>();
@@ -65,6 +73,9 @@ namespace Smocks.Injection
             container.RegisterSingleton<IParameterDeducer, ParameterDeducer>();
             container.RegisterSingleton<IArgumentGenerator, ArgumentGenerator>();
 
+            container.RegisterSingleton<IAssemblyPostProcessor, AssemblyAttributesFilter>();
+            container.RegisterSingleton<IAssemblyPostProcessor, ModuleMvidPostProcessor>();
+
             container.RegisterSingleton<ITypeResolver, TypeResolver>();
             container.RegisterSingleton<IModuleResolver, ModuleResolver>();
             container.RegisterSingleton<IFieldResolver, FieldResolver>();
@@ -72,6 +83,9 @@ namespace Smocks.Injection
 
             container.RegisterSingleton<SetupExtractor, SetupExtractor>();
             container.RegisterSingleton<ISetupExtractor, SetupExtractor>();
+            container.RegisterSingleton<IEventTargetExtractor, EventTargetExtractor>();
+            container.RegisterSingleton<IEventAccessorExtractor, EventAccessorExtractor>();
+
             container.RegisterSingleton<IDependencyGraphBuilder, DependencyGraphBuilder>();
 
             container.RegisterSingleton<IModuleFilterFactory, ModuleFilterFactory>();

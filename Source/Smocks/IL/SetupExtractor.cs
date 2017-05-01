@@ -36,14 +36,14 @@ namespace Smocks.IL
 {
     internal class SetupExtractor : ISetupExtractor
     {
-        private readonly IExpressionDecompiler _expressionDecompiler;
+        private readonly IExpressionDecompiler<Expression> _expressionDecompiler;
         private readonly IExpressionHelper _expressionHelper;
         private readonly IMethodDisassembler _methodDisassembler;
         private readonly List<MethodInfo> _setupMethods = GetSetupMethods().ToList();
 
         internal SetupExtractor(
             IMethodDisassembler methodDisassembler,
-            IExpressionDecompiler expressionDecompiler,
+            IExpressionDecompiler<Expression> expressionDecompiler,
             IExpressionHelper expressionHelper)
         {
             ArgumentChecker.NotNull(methodDisassembler, () => methodDisassembler);
@@ -57,12 +57,13 @@ namespace Smocks.IL
 
         public IEnumerable<SetupTarget> GetSetups(MethodBase method, object target)
         {
-            DisassembleResult disassembleResult = _methodDisassembler.Disassemble(method);
+            using (DisassembleResult disassembleResult = _methodDisassembler.Disassemble(method))
+            {
+                List<MethodDefinition> setupMethods = _setupMethods.Select(setupMethod =>
+                    disassembleResult.ModuleDefinition.ImportReference(setupMethod).Resolve()).ToList();
 
-            List<MethodDefinition> setupMethods = _setupMethods.Select(setupMethod =>
-                disassembleResult.ModuleDefinition.Import(setupMethod).Resolve()).ToList();
-
-            return GetSetupsFromInstructions(target, disassembleResult.Body, setupMethods);
+                return GetSetupsFromInstructions(target, disassembleResult.Body, setupMethods);
+            }
         }
 
         public IEnumerable<SetupTarget> GetSetups(MethodBase method)
@@ -118,8 +119,7 @@ namespace Smocks.IL
 
                     if (methodCall == null)
                     {
-                        string message = string.Format(
-                            "Could not extract method from expression {0}", expression);
+                        string message = $"Could not extract method from expression {expression}";
                         throw new SetupExtractionException(message);
                     }
 

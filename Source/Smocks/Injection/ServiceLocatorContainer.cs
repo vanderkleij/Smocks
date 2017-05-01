@@ -23,14 +23,16 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using Smocks.Utility;
 
 namespace Smocks.Injection
 {
     internal class ServiceLocatorContainer : IServiceLocatorContainer
     {
-        private readonly ConcurrentDictionary<Type, Delegate> _registrations =
-            new ConcurrentDictionary<Type, Delegate>();
+        private readonly ConcurrentDictionary<Type, Delegate[]> _registrations = 
+            new ConcurrentDictionary<Type, Delegate[]>();
 
         private readonly IServiceCreator _serviceCreator;
 
@@ -62,50 +64,74 @@ namespace Smocks.Injection
         public void Register<TService, TImplementation>() where TImplementation : TService
         {
             Func<TImplementation> factory = Create<TImplementation>;
-            _registrations.AddOrUpdate(typeof(TService), factory, (type, existing) => factory);
+            AddOrUpdate(typeof(TService), factory);
+        }
+
+        private void AddOrUpdate<TService>(Type type, Func<TService> instanceFactory)
+        {
+            Func<Type, Delegate[], Delegate[]> updateAction = (_, existingArray) =>
+            {
+                Delegate[] updatedArray = new Delegate[existingArray.Length + 1];
+                Array.Copy(existingArray, updatedArray, existingArray.Length);
+                updatedArray[updatedArray.Length - 1] = instanceFactory;
+                return updatedArray;
+            };
+
+            _registrations.AddOrUpdate(
+                type, 
+                _ => new Delegate[] { instanceFactory },
+                updateAction);
         }
 
         public void RegisterSingleton<TService, TImplementation>()
             where TImplementation : TService
         {
             Func<TImplementation> factory = GetOrCreateSingleton<TImplementation>;
-            _registrations.AddOrUpdate(typeof(TService), factory, (type, existing) => factory);
+            AddOrUpdate(typeof(TService), factory);
         }
 
         public void RegisterSingleton<TService, TImplementation>(TImplementation instance) where TImplementation : TService
         {
             Func<TImplementation> factory = () => instance;
-            _registrations.AddOrUpdate(typeof(TService), factory, (type, existing) => factory);
+            AddOrUpdate(typeof(TService), factory);
         }
 
-        public T Resolve<T>()
+        public TService Resolve<TService>()
         {
-            Delegate factory;
-            _registrations.TryGetValue(typeof(T), out factory);
+            Delegate[] factories;
+            _registrations.TryGetValue(typeof(TService), out factories);
 
-            Func<T> typedFactory = factory as Func<T>;
+            var typedFactories = factories?.OfType<Func<TService>>().ToList();
 
-            if (typedFactory == null)
+            if (typedFactories == null || typedFactories.Count == 0)
             {
-                throw new InvalidOperationException("No registration found for " + typeof(T).Name);
+                throw new InvalidOperationException("No registration found for " + typeof(TService).Name);
             }
 
-            return typedFactory();
+            return typedFactories[typedFactories.Count - 1]();
         }
 
         public bool TryResolve(Type type, out object instance)
         {
-            Delegate factory;
-            _registrations.TryGetValue(type, out factory);
+            Delegate[] factories;
+            _registrations.TryGetValue(type, out factories);
 
-            if (factory == null)
+            if (factories == null || factories.Length == 0)
             {
                 instance = null;
                 return false;
             }
 
-            instance = factory.DynamicInvoke();
+            instance = factories[factories.Length - 1].DynamicInvoke();
             return true;
+        }
+
+        public IEnumerable<TService> ResolveAll<TService>()
+        {
+            Delegate[] factories;
+            _registrations.TryGetValue(typeof(TService), out factories);
+
+            return factories?.OfType<Func<TService>>().Select(factory => factory()) ?? Enumerable.Empty<TService>();
         }
 
         private T Create<T>()
@@ -116,6 +142,17 @@ namespace Smocks.Injection
         private T GetOrCreateSingleton<T>()
         {
             return (T)_singletons.GetOrAdd(typeof(T), type => Create<T>());
+        }
+
+        public void Dispose()
+        {
+            foreach (var disposable in _singletons.Values.OfType<IDisposable>())
+            {
+                disposable.Dispose();
+            }
+
+            _singletons.Clear();
+            _registrations.Clear();
         }
     }
 }

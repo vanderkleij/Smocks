@@ -21,12 +21,15 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System;
+using System.Collections.Generic;
+
 namespace Smocks.Injection
 {
     /// <summary>
     /// A service locator used for dependency injection.
     /// </summary>
-    public interface IServiceLocator
+    public interface IServiceLocator : IDisposable
     {
         /// <summary>
         /// Gets the container.
@@ -39,5 +42,12 @@ namespace Smocks.Injection
         /// <typeparam name="T">The type to resolve.</typeparam>
         /// <returns>An instance of <see cref="T"/></returns>
         T Resolve<T>();
+
+        /// <summary>
+        /// Returns an instance of every registered implementation of the specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>An instance of every registered implementation of the specified type.</returns>
+        IEnumerable<T> ResolveAll<T>();
     }
 }

@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Smocks.Utility;
 
@@ -71,14 +72,38 @@ namespace Smocks.Injection
         /// <summary>
         /// Gets the container.
         /// </summary>
-        public IServiceLocatorContainer Container
-        {
-            get { return _container; }
-        }
+        public IServiceLocatorContainer Container => _container;
 
+        /// <summary>
+        /// Resolves the specified type.
+        /// </summary>
+        /// <typeparam name="T">The type to resolve.</typeparam>
+        /// <returns>
+        /// An instance of <see cref="T" />
+        /// </returns>
         public T Resolve<T>()
         {
             return _container.Resolve<T>();
+        }
+
+        /// <summary>
+        /// Returns an instance of every registered implementation of the specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>
+        /// An instance of every registered implementation of the specified type.
+        /// </returns>
+        public IEnumerable<T> ResolveAll<T>()
+        {
+            return _container.ResolveAll<T>();
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            _container.Dispose();
         }
     }
 }

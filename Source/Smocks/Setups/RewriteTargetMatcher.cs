@@ -21,40 +21,36 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Mono.Cecil;
 using Smocks.IL;
 using Smocks.Utility;
+using Smocks.Extension;
 
 namespace Smocks.Setups
 {
-    internal class SetupTargetCollection : ISetupTargetCollection
+    internal class RewriteTargetMatcher : IRewriteTargetMatcher
     {
-        private readonly ReadOnlyCollection<SetupTarget> _targets;
+        private readonly List<Tuple<IRewriteTarget, MethodReference>> _targets;
 
-        public SetupTargetCollection(IEnumerable<SetupTarget> targets)
+        public RewriteTargetMatcher(IMethodImporter methodImporter, ReadOnlyCollection<IRewriteTarget> targets)
         {
+            ArgumentChecker.NotNull(methodImporter, () => methodImporter);
             ArgumentChecker.NotNull(targets, () => targets);
 
-            _targets = targets.ToList().AsReadOnly();
+            _targets = targets
+                .SelectMany(target => target.Methods, (target, method) => Tuple.Create(target, methodImporter.Import(method)))
+                .ToList();
         }
 
-        public IEnumerator<SetupTarget> GetEnumerator()
+        public IEnumerable<IRewriteTarget> GetMatchingTargets(MethodReference method)
         {
-            return _targets.GetEnumerator();
-        }
-
-        public ISetupTargetMatcher GetMatcher(ModuleDefinition module)
-        {
-            return new SetupTargetMatcher(new ModuleDefinitionMethodImporter(module), _targets);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            return _targets
+                .Where(pair => pair.Item2.FullName.IsFullNameGenericMatching(method.FullName))
+                .Select(pair => pair.Item1);
         }
     }
 }

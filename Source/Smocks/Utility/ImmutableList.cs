@@ -48,10 +48,7 @@ namespace Smocks.Utility
             _items = items;
         }
 
-        public int Count
-        {
-            get { return _items.Length; }
-        }
+        public int Count => _items.Length;
 
         public static ImmutableList<T> Create(params T[] items)
         {
@@ -99,18 +96,9 @@ namespace Smocks.Utility
                 _items = items;
             }
 
-            public T Current
-            {
-                get
-                {
-                    return _current;
-                }
-            }
+            public T Current => _current;
 
-            object IEnumerator.Current
-            {
-                get { return Current; }
-            }
+            object IEnumerator.Current => Current;
 
             public void Dispose()
             {

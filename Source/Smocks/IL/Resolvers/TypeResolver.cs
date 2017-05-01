@@ -53,7 +53,7 @@ namespace Smocks.IL.Resolvers
             {
                 Type genericType = Resolve(genericInstanceType.Resolve());
                 Type[] genericArguments = genericInstanceType.GenericArguments
-                    .Select(argument => bindingContext.Resolve(argument))
+                    .Select(bindingContext.Resolve)
                     .Select(argument => Resolve(argument, bindingContext)).ToArray();
                 return genericType.MakeGenericType(genericArguments);
             }

@@ -45,12 +45,9 @@ namespace Smocks.IL.Dependencies
             _moduleComparer = moduleComparer;
         }
 
-        public ModuleReference Module { get; private set; }
+        public ModuleReference Module { get; }
 
-        public ISet<DependencyGraphNode> Nodes
-        {
-            get { return _nodes; }
-        }
+        public ISet<DependencyGraphNode> Nodes => _nodes;
 
         public bool Equals(DependencyGraphNode other)
         {
@@ -74,7 +71,7 @@ namespace Smocks.IL.Dependencies
 
         public override int GetHashCode()
         {
-            return Module != null ? Module.GetHashCode() : 0;
+            return Module?.GetHashCode() ?? 0;
         }
 
         [ExcludeFromCodeCoverage]

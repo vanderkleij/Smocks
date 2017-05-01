@@ -22,7 +22,6 @@
 #endregion
 using System;
 using System.Diagnostics.CodeAnalysis;
-using Mono.Cecil;
 using NUnit.Framework;
 using Smocks.IL;
 using Smocks.IL.Dependencies;

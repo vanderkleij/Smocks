@@ -45,28 +45,37 @@
     <AssemblyOriginatorKeyFile>..\Smocks.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net40\Mono.Cecil.dll</HintPath>
+    <Reference Include="Aspose.Cells, Version=9.0.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <HintPath>..\packages\Aspose.Cells.9.0.0\lib\net40\Aspose.Cells.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Mono.Cecil.Mdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+    <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.10.0-beta1-v2\lib\net40\Mono.Cecil.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Mono.Cecil.Pdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.10.0-beta1-v2\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Mono.Cecil.Rocks, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.10.0-beta1-v2\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.10.0-beta1-v2\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Moq, Version=4.2.1502.911, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Moq.4.2.1502.0911\lib\net40\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
+    <Reference Include="NSubstitute, Version=1.10.0.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
+      <HintPath>..\packages\NSubstitute.1.10.0.0\lib\net40\NSubstitute.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
@@ -86,6 +95,7 @@
     <Compile Include="AppDomains\AssemblyLoaderFactoryTests.cs" />
     <Compile Include="AppDomains\AssemblyLoaderTests.cs" />
     <Compile Include="AppDomains\AssemblyResolverTests.cs" />
+    <Compile Include="AppDomains\CecilAssemblyResolverTests.cs" />
     <Compile Include="AppDomains\EnumerableReturnValueTransformerTests.cs" />
     <Compile Include="AppDomains\GenericEnumerableReturnValueTransformerTests.cs" />
     <Compile Include="AppDomains\LoadedAssemblyFinderTests.cs" />
@@ -102,6 +112,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CallbackTests.Generated.tt</DependentUpon>
     </Compile>
+    <Compile Include="EventsTests.cs" />
     <Compile Include="FuncTests.cs" />
     <Compile Include="IL\ArgumentGeneratorTests.cs" />
     <Compile Include="IL\CompiledDynamicMethodTests.cs" />
@@ -125,6 +136,7 @@
     <Compile Include="Issues\IssueEightTests.cs" />
     <Compile Include="Issues\IssueElevenTests.cs" />
     <Compile Include="Issues\IssueTwelveTests.cs" />
+    <Compile Include="Issues\IssueTwentySixTests.cs" />
     <Compile Include="Logging\LoggerExtensionsTests.cs" />
     <Compile Include="MethodTests.cs" />
     <Compile Include="OutParameterTests.cs" />
@@ -134,10 +146,10 @@
     <Compile Include="Serialization\SerializerTests.cs" />
     <Compile Include="Setups\ArgumentMatcherTests.cs" />
     <Compile Include="Setups\InvocationTrackerTests.cs" />
+    <Compile Include="Setups\RewriteTargetMatcherTests.cs" />
     <Compile Include="Setups\SetupManagerTests.cs" />
     <Compile Include="Setups\SetupMatcherTests.cs" />
     <Compile Include="Setups\SetupTargetCollectionTests.cs" />
-    <Compile Include="Setups\SetupTargetMatcherTests.cs" />
     <Compile Include="Setups\SetupTargetTests.cs" />
     <Compile Include="Setups\SetupTests.cs" />
     <Compile Include="Setups\GenericSetupTests.cs" />

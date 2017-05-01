@@ -85,7 +85,7 @@ namespace Smocks.Utility
 
         public override int GetHashCode()
         {
-            return Method != null ? Method.GetHashCode() : 0;
+            return Method?.GetHashCode() ?? 0;
         }
 
         [ExcludeFromCodeCoverage]

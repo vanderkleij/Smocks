@@ -32,7 +32,7 @@ namespace Smocks.IL
     internal class RewriteContext
     {
         public RewriteContext(Configuration configuration, ILProcessor processor,
-            Instruction originalInstruction, List<SetupTarget> targets, MethodReference method)
+            Instruction originalInstruction, List<IRewriteTarget> targets, MethodReference method)
         {
             Variables = new List<VariableDefinition>();
             Configuration = configuration;
@@ -42,22 +42,19 @@ namespace Smocks.IL
             Method = method;
         }
 
-        public Configuration Configuration { get; private set; }
+        public Configuration Configuration { get; }
 
-        public MethodReference Method { get; private set; }
+        public MethodReference Method { get; }
 
-        public Instruction OriginalInstruction { get; set; }
+        public Instruction OriginalInstruction { get; }
 
-        public ILProcessor Processor { get; private set; }
+        public ILProcessor Processor { get; }
 
-        public List<SetupTarget> Targets { get; set; }
+        public List<IRewriteTarget> Targets { get; }
 
-        public List<VariableDefinition> Variables { get; private set; }
+        public List<VariableDefinition> Variables { get; }
 
-        public Instruction CurrentPosition
-        {
-            get { return OriginalInstruction.Previous; }
-        }
+        public Instruction CurrentPosition => OriginalInstruction.Previous;
 
         public void InsertAfter(Instruction target, IEnumerable<Instruction> instructions)
         {

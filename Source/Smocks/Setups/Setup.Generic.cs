@@ -55,10 +55,7 @@ namespace Smocks.Setups
 
         public bool HasConstantReturnValue { get; private set; }
 
-        public bool HasReturnValue
-        {
-            get { return HasConstantReturnValue || ReturnValueGenerator != null; }
-        }
+        public bool HasReturnValue => HasConstantReturnValue || ReturnValueGenerator != null;
 
         public Func<object[], TReturnValue> ReturnValueGenerator
         {
@@ -112,7 +109,7 @@ namespace Smocks.Setups
         {
             if (ParameterCount != 0)
             {
-                throw new ArgumentException("Invalid parameter count", "callback");
+                throw new ArgumentException("Invalid parameter count", nameof(callback));
             }
 
             CallbackAction = args => callback();

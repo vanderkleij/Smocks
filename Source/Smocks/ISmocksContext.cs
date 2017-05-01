@@ -52,5 +52,25 @@ namespace Smocks
         /// Verifies the expectations configured for the setups.
         /// </summary>
         void Verify();
+
+        /// <summary>
+        /// Raises the specified event.
+        /// </summary>
+        /// <param name="addExpression">A lambda pointing to the add handler of the event to raise.</param>
+        /// <param name="removeExpression">A lambda pointing to the remove handler of the event to raise.</param>
+        /// <param name="eventArgs">The instance containing the event data.</param>
+        /// <returns>
+        /// The value returned from invoking the event, if any.
+        /// </returns>
+        object Raise(Action addExpression, Action removeExpression, EventArgs eventArgs);
+
+        /// <summary>
+        /// Raises the specified event.
+        /// </summary>
+        /// <param name="addExpression">A lambda pointing to the add handler of the event to raise.</param>
+        /// <param name="removeExpression">A lambda pointing to the remove handler of the event to raise.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The value returned from invoking the event, if any.</returns>
+        object Raise(Action addExpression, Action removeExpression, params object[] arguments);
     }
 }

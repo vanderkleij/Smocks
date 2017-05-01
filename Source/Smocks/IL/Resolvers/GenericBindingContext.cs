@@ -1,25 +1,27 @@
 ﻿#region License
+
 //// The MIT License (MIT)
-//// 
+////
 //// Copyright (c) 2015 Tom van der Kleij
-//// 
+////
 //// Permission is hereby granted, free of charge, to any person obtaining a copy of
 //// this software and associated documentation files (the "Software"), to deal in
 //// the Software without restriction, including without limitation the rights to
 //// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 //// the Software, and to permit persons to whom the Software is furnished to do so,
 //// subject to the following conditions:
-//// 
+////
 //// The above copyright notice and this permission notice shall be included in all
 //// copies or substantial portions of the Software.
-//// 
+////
 //// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 //// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 //// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 //// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion License
 
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +33,7 @@ namespace Smocks.IL.Resolvers
     internal class GenericBindingContext
     {
         private static readonly Regex MethodIndexPattern = new Regex(@"^!!(\d+)$", RegexOptions.Compiled);
-        private static readonly Regex TypeIndexPattern = new Regex(@"^!(\d+)$", RegexOptions.Compiled);
         private readonly List<Entry> _methodEntries = new List<Entry>();
-        private readonly List<Entry> _typeEntries = new List<Entry>();
 
         public GenericBindingContext()
         {
@@ -61,14 +61,7 @@ namespace Smocks.IL.Resolvers
 
         public TypeReference Resolve(TypeReference argument)
         {
-            Match match = TypeIndexPattern.Match(argument.FullName);
-
-            if (match.Success)
-            {
-                return _typeEntries[int.Parse(match.Groups[1].Value)].Binding;
-            }
-
-            match = MethodIndexPattern.Match(argument.FullName);
+            var match = MethodIndexPattern.Match(argument.FullName);
 
             if (match.Success)
             {
@@ -88,9 +81,9 @@ namespace Smocks.IL.Resolvers
                 Binding = binding;
             }
 
-            public TypeReference Binding { get; private set; }
+            public TypeReference Binding { get; }
 
-            public string Name { get; private set; }
+            public string Name { get; }
         }
     }
 }

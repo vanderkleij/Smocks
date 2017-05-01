@@ -65,8 +65,11 @@ namespace Smocks.Tests.IL.Filters
                     It.Is<ModuleReference>(module => IsAny(module, query, child))))
                 .Returns(true);
 
-            HashSet<DependencyGraphNode> nodes = new HashSet<DependencyGraphNode>();
-            nodes.Add(new DependencyGraphNode(child, _moduleComparerMock.Object));
+            HashSet<DependencyGraphNode> nodes = new HashSet<DependencyGraphNode>
+            {
+                new DependencyGraphNode(child, _moduleComparerMock.Object)
+            };
+
             _graphMock.SetupGet(graph => graph.Nodes).Returns(nodes);
 
             var subject = new DirectReferencesModuleFilter(_graphMock.Object, _moduleComparerMock.Object);

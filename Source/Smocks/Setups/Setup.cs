@@ -37,7 +37,7 @@ namespace Smocks.Setups
         {
             if (ParameterCount != 0)
             {
-                throw new ArgumentException("Invalid parameter count", "callback");
+                throw new ArgumentException("Invalid parameter count", nameof(callback));
             }
 
             CallbackAction = args => callback();

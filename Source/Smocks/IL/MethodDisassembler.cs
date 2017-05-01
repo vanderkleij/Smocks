@@ -30,6 +30,15 @@ namespace Smocks.IL
 {
     internal class MethodDisassembler : IMethodDisassembler
     {
+        private readonly IAssemblyResolver _assemblyResolver;
+
+        public MethodDisassembler(IAssemblyResolver assemblyResolver)
+        {
+            ArgumentChecker.NotNull(assemblyResolver, nameof(assemblyResolver));
+
+            _assemblyResolver = assemblyResolver;
+        }
+
         public DisassembleResult Disassemble(MethodBase method)
         {
             ArgumentChecker.NotNull(method, () => method);
@@ -37,18 +46,23 @@ namespace Smocks.IL
                 "Method must be in a type", "method");
 
             string location = method.DeclaringType.Assembly.Location;
-            ModuleDefinition module = ModuleDefinition.ReadModule(location);
+            var parameters = new ReaderParameters
+            {
+                AssemblyResolver = _assemblyResolver
+            };
 
-            var foundMethod = module.Import(method).Resolve();
+            ModuleDefinition module = ModuleDefinition.ReadModule(location, parameters);
+
+            var foundMethod = module.ImportReference(method).Resolve();
 
             if (foundMethod == null)
             {
-                throw new ArgumentException("Could not find method in assembly", "method");
+                throw new ArgumentException("Could not find method in assembly", nameof(method));
             }
 
             if (foundMethod.Body == null)
             {
-                throw new ArgumentException("Method has no body", "method");
+                throw new ArgumentException("Method has no body", nameof(method));
             }
 
             return new DisassembleResult(module, foundMethod.Body);

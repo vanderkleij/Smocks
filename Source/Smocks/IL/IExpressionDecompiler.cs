@@ -21,13 +21,38 @@
 //// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using System.Linq.Expressions;
 using Mono.Cecil.Cil;
 
 namespace Smocks.IL
 {
-    internal interface IExpressionDecompiler
+    internal interface IExpressionDecompiler<out TExpression>
     {
-        Expression Decompile(MethodBody body, Instruction instruction, object target);
+        /// <summary>
+        /// Decompiles an expression that's on the stack at the specified
+        /// instruction in the specified method. This is done by reversing from the
+        /// specified instruction until the stack should be empty. The instructions
+        /// can then be replayed from that point.
+        /// </summary>
+        /// <param name="body">The body.</param>
+        /// <param name="instruction">The instruction.</param>
+        /// <param name="target">The target of the method, if any.</param>
+        /// <returns>The compiled expression.</returns>
+        TExpression Decompile(MethodBody body, Instruction instruction, object target);
+
+        /// <summary>
+        /// Decompiles an expression that's on the stack at the specified
+        /// instruction in the specified method. This is done by reversing from the
+        /// specified instruction until the stack should be empty. The instructions
+        /// can then be replayed from that point.
+        /// </summary>
+        /// <param name="body">The body.</param>
+        /// <param name="instruction">The instruction.</param>
+        /// <param name="target">The target of the method, if any.</param>
+        /// <param name="expectedStackSize">The number of objects expected to be on the stack when we get to the instruction.</param>
+        /// <param name="stackEntriesToSkip">The number of stack entries to skip.</param>
+        /// <returns>
+        /// The compiled expression.
+        /// </returns>
+        TExpression Decompile(MethodBody body, Instruction instruction, object target, int expectedStackSize, int stackEntriesToSkip);
     }
 }

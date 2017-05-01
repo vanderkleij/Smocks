@@ -29,6 +29,6 @@ namespace Smocks.IL
     internal interface IMethodRewriter
     {
         bool Rewrite(Configuration configuration, MethodDefinition method,
-            ISetupTargetMatcher setupTargetMatcher);
+            IRewriteTargetMatcher rewriteTargetMatcher);
     }
 }

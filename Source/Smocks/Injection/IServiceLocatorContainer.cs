@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 namespace Smocks.Injection
 {
@@ -29,7 +30,7 @@ namespace Smocks.Injection
     /// A dependency injection container. Used to register and subsequently
     /// resolve types.
     /// </summary>
-    public interface IServiceLocatorContainer
+    public interface IServiceLocatorContainer : IDisposable
     {
         /// <summary>
         /// Registers an implementation type for a service type.
@@ -70,5 +71,12 @@ namespace Smocks.Injection
         /// <param name="instance">The instance, if one could be resolved.</param>
         /// <returns>Whether an instance could be resolved.</returns>
         bool TryResolve(Type type, out object instance);
+
+        /// <summary>
+        /// Returns an instance of every registered implementation of the specified type.
+        /// </summary>
+        /// <typeparam name="TService">The type to resolve.</typeparam>
+        /// <returns>An instance of every registered implementation of the specified type.</returns>
+        IEnumerable<TService> ResolveAll<TService>();
     }
 }
