@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Smocks.Setups;
 using Smocks.Utility;
+using System.Text;
 
 namespace Smocks.Exceptions
 {
@@ -60,7 +61,22 @@ namespace Smocks.Exceptions
         {
             ArgumentChecker.NotNull(notMatchedSetups, () => notMatchedSetups);
 
-            return "Verification failed";
+            StringBuilder message = new StringBuilder();
+            foreach (IInternalSetup setup in notMatchedSetups)
+            {
+                if (!string.IsNullOrEmpty(message.ToString()))
+                    message.Append(",");
+                message.Append(Environment.NewLine);
+                message.Append(setup.MethodCall.Method.ReflectedType);
+                message.Append(".");
+                message.Append(setup.MethodCall.Method.Name);
+                message.Append("(");
+                if (setup.MethodCall.Arguments.Count > 0)
+                    message.Append(string.Join(",", setup.MethodCall.Arguments));
+                message.Append(")");
+            }
+
+            return "Verification failed for method setups : " + message.ToString();
         }
     }
 }
