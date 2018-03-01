@@ -28,6 +28,7 @@ using System.Linq;
 using Mono.Cecil;
 using Smocks.IL;
 using Smocks.Utility;
+using Smocks.Extension;
 
 namespace Smocks.Setups
 {
@@ -48,7 +49,7 @@ namespace Smocks.Setups
         public IEnumerable<IRewriteTarget> GetMatchingTargets(MethodReference method)
         {
             return _targets
-                .Where(pair => pair.Item2.FullName.Equals(method.FullName))
+                .Where(pair => pair.Item2.FullName.IsFullNameGenericMatching(method.FullName))
                 .Select(pair => pair.Item1);
         }
     }

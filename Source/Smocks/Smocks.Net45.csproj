@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -87,6 +89,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Exceptions\SetupExtractionException.cs" />
     <Compile Include="Exceptions\VerificationException.cs" />
+    <Compile Include="Extension\ExternalGenericMatch.cs" />
     <Compile Include="IL\ArgumentGenerator.cs" />
     <Compile Include="IL\Dependencies\IDependencyGraph.cs" />
     <Compile Include="IL\EventAccessorExtractor.cs" />
@@ -289,6 +292,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
